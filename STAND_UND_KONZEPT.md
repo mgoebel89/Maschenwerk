@@ -14,9 +14,12 @@ Runde abzuarbeiten. Hauptsächlich **Socken** (für verschiedene Personen in der
 - Konzept geschrieben und Funktionsumfang in drei Fragerunden abgestimmt.
 - **Stufe A gebaut**, lokales Git-Repo (Zweig `main`), Commit `c36d70b`. Auf GitHub gepusht:
   `https://github.com/mgoebel89/Maschenwerk` (öffentlich, Installer per raw-URL abrufbar, geprüft).
-  **Installiert als CT 119** (2026-11-02), alle Abnahmeprüfungen grün. Matthias hat die IP während der
-  Einrichtung auf **192.168.5.40** umgestellt → Zertifikat wurde noch auf die alte DHCP-Adresse
-  192.168.2.121 ausgestellt und muss neu erzeugt werden. Praxistest am Handy steht aus.
+  **Installiert als CT 119 unter https://192.168.5.40** (2026-11-02), Zertifikat neu erzeugt,
+  `pct exec 119 -- update` funktioniert, Matthias: „läuft soweit alles". **Stufe A im Container abgenommen.**
+  Fixes beim Installieren: `de9a6f6` (nginx-Standardseite, CT_HOSTNAME), `93b9b79` (alle IPs ins Zertifikat),
+  `36e5cc0` (Befehle auch in /usr/bin, weil pct exec /usr/local nicht im PATH hat).
+- Nächstes: Stufe B (Rundsocke, Projekt-Assistent, Strickmodus, PDF). Dafür gebraucht: Seiten der
+  KR-586-Anleitung zu Rundstricken und Ribberschloss-Einstellungen.
 - Lokal geprüft (Browser-Pane, `tests/dev_server.py`, Launch-Config `maschenwerk-dev` Port 8470):
   Person anlegen → Messmaske (Schritte, Tippen auf Linie, Speichern beim sofortigen Verlassen,
   Plausibilitätswarnung), Garn, Probe rund (40 M/13,3 cm, 60 Rd/14,3 cm → 30,1 M / 42 Rd),
