@@ -31,7 +31,7 @@ Mit fester IP und Container-Nummer:
 CTID=240 IPV4=192.168.5.60/24 GATEWAY=192.168.5.1 bash -c "$(wget -qO- https://raw.githubusercontent.com/mgoebel89/Maschenwerk/main/deploy/proxmox-install.sh)"
 ```
 
-Weitere Variablen: `HOSTNAME`, `STORAGE`, `DISK_GB`, `MEMORY_MB`, `BRIDGE`, `HTTPS_PORT` (siehe Kopf von
+Weitere Variablen: `CT_HOSTNAME`, `STORAGE`, `DISK_GB`, `MEMORY_MB`, `BRIDGE`, `HTTPS_PORT` (siehe Kopf von
 `deploy/proxmox-install.sh`). Das Zertifikat ist selbstsigniert; die Browserwarnung je Gerät einmal bestätigen.
 
 ## Betrieb

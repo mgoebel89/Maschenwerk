@@ -14,7 +14,8 @@ set -euo pipefail
 
 # -------- Defaults (per Env überschreibbar) --------
 : "${CTID:=}"                              # leer = nächste freie ID
-: "${HOSTNAME:=maschenwerk}"
+# NICHT "HOSTNAME": das setzt bash selbst (Name des Proxmox-Hosts), ein Vorgabewert griffe nie.
+: "${CT_HOSTNAME:=maschenwerk}"
 : "${STORAGE:=local-lvm}"                  # Storage für das Container-Volume
 : "${TEMPLATE_STORAGE:=local}"             # Storage, in dem die Templates liegen
 : "${DISK_GB:=4}"
@@ -69,9 +70,9 @@ else
   NET_OPTS="${NET_OPTS},ip=${IPV4},gw=${GATEWAY}"
 fi
 
-log "Erzeuge LXC ${CTID} (${HOSTNAME})…"
+log "Erzeuge LXC ${CTID} (${CT_HOSTNAME})…"
 pct create "$CTID" "$TEMPLATE_REF" \
-  --hostname "$HOSTNAME" \
+  --hostname "$CT_HOSTNAME" \
   --cores "$CORES" \
   --memory "$MEMORY_MB" \
   --swap "$SWAP_MB" \
@@ -109,7 +110,7 @@ pct exec "$CTID" -- bash -lc "
 log "Richte Maschenwerk im Container ein (das dauert einige Minuten)…"
 if ! pct exec "$CTID" -- env \
       REPO_URL="$REPO_URL" REPO_BRANCH="$REPO_BRANCH" \
-      HTTP_PORT="$HTTP_PORT" HTTPS_PORT="$HTTPS_PORT" CERT_HOST="$HOSTNAME" \
+      HTTP_PORT="$HTTP_PORT" HTTPS_PORT="$HTTPS_PORT" CERT_HOST="$CT_HOSTNAME" \
       bash /opt/maschenwerk/deploy/container-setup.sh; then
   err "Die Einrichtung im Container ist fehlgeschlagen (Meldungen oben)."
   err "Der Container $CTID bleibt bestehen. Nach dem Beheben erneut versuchen mit:"
@@ -124,7 +125,7 @@ ok "Fertig."
 echo
 echo "─────────────────────────────────────────────"
 echo "  Container-ID : $CTID"
-echo "  Hostname     : $HOSTNAME"
+echo "  Hostname     : $CT_HOSTNAME"
 echo "  IP           : ${CT_IP:-(noch nicht verfügbar)}"
 echo "  URL          : https://${CT_IP:-<IP>}${SUFFIX}"
 if [[ "$GENERATED_PW" -eq 1 ]]; then

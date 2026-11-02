@@ -61,6 +61,9 @@ else
   git clone --branch "$REPO_BRANCH" "$REPO_URL" "$APP_DIR"
 fi
 ok "Stand: $(git -C "$APP_DIR" log -1 --pretty=format:'%h %s')"
+# Sofort installieren: bricht ein späterer Schritt ab, verweist die Fehlermeldung
+# auf genau diesen Befehl.
+install -m 0755 "$APP_DIR/deploy/container-setup.sh" /usr/local/bin/maschenwerk-setup
 
 # --------------------------------------------------------------- Backend ----
 schritt='Backend-Abhängigkeiten installieren (better-sqlite3 kann übersetzt werden, das dauert)'
@@ -110,15 +113,20 @@ sed -e "s/__HTTP_PORT__/${HTTP_PORT}/g" \
     "$APP_DIR/deploy/nginx-site.conf" > /etc/nginx/sites-available/maschenwerk
 ln -sfn /etc/nginx/sites-available/maschenwerk /etc/nginx/sites-enabled/maschenwerk
 
-# Erst prüfen, DANN die Standard-Site entfernen — andersherum hinterlässt ein
-# Konfigurationsfehler einen Container, der weiter die nginx-Startseite zeigt.
+# Die Debian-Standardseite MUSS vor der Prüfung weg: sie belegt ebenfalls
+# `default_server` auf Port 80, und mit beiden zusammen scheitert `nginx -t`
+# immer ("duplicate default server"). Scheitert die Prüfung trotzdem, wird die
+# Standardseite wiederhergestellt, damit nginx weiter startet.
 schritt='nginx-Konfiguration prüfen'
+STANDARD=/etc/nginx/sites-enabled/default
+HATTE_STANDARD=0
+if [[ -e "$STANDARD" || -L "$STANDARD" ]]; then HATTE_STANDARD=1; rm -f "$STANDARD"; fi
 if ! nginx -t; then
-  err "nginx-Konfiguration fehlerhaft — Standard-Site bleibt aktiv."
+  rm -f /etc/nginx/sites-enabled/maschenwerk
+  if [[ "$HATTE_STANDARD" -eq 1 ]]; then ln -sfn /etc/nginx/sites-available/default "$STANDARD"; fi
+  err "nginx-Konfiguration fehlerhaft — Maschenwerk-Site wieder entfernt, Standard-Site aktiv."
   exit 1
 fi
-rm -f /etc/nginx/sites-enabled/default
-nginx -t
 systemctl enable nginx >/dev/null 2>&1
 systemctl reload nginx || systemctl restart nginx
 ok "nginx konfiguriert."
