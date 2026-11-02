@@ -12,6 +12,10 @@ install -m 0755 "$D/selbstupdate.sh"    /usr/local/sbin/maschenwerk-selbstupdate
 install -m 0755 "$D/backup.sh"          /usr/local/bin/maschenwerk-backup
 install -m 0755 "$D/container-setup.sh" /usr/local/bin/maschenwerk-setup
 ln -sfn /usr/local/sbin/maschenwerk-update /usr/local/bin/update
+# `pct exec` startet mit PATH=/sbin:/bin:/usr/sbin:/usr/bin — ohne /usr/local.
+# Damit `pct exec <CTID> -- update` vom Proxmox-Host aus klappt, liegen die
+# Befehle zusätzlich in /usr/bin.
+for b in update maschenwerk-setup maschenwerk-backup; do ln -sfn "/usr/local/bin/$b" "/usr/bin/$b"; done
 
 # Update auf Knopfdruck: der Webdienst legt Anfrage-Dateien in
 # /var/lib/maschenwerk/update/ ab, diese .path-Einheiten starten das Skript als root.
