@@ -8,6 +8,7 @@ vollständig durchklicken lässt. Daten liegen nur im Speicher.
 """
 import json
 import sys
+import tempfile
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -17,6 +18,7 @@ VERSION = json.loads((Path(__file__).resolve().parent.parent / "backend" / "pack
 TABELLEN = ["personen", "garne", "proben", "projekte", "vorlagen"]
 DATEN = {t: {} for t in TABELLEN}
 DATEN["settings"] = None
+ZAEHLER = {"stand": 0, "zeit": None}
 
 
 def jetzt():
@@ -75,6 +77,8 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json({**alles(), "version": VERSION, "serverTime": jetzt()})
         if t == ["export"]:
             return self._json({"app": "maschenwerk", "version": VERSION, "exportiertAm": jetzt(), "daten": alles()})
+        if t == ["zaehler"]:
+            return self._json(ZAEHLER)
         if t == ["system"]:
             return self._json({"eingerichtet": False, "version": VERSION, "pruefung": None, "lauf": None,
                                "laeuft": False, "wartet": {"pruefen": False, "ausfuehren": False}, "protokoll": ""})
@@ -117,6 +121,22 @@ class Handler(SimpleHTTPRequestHandler):
             if body["daten"].get("settings"):
                 DATEN["settings"] = body["daten"]["settings"]
             return self._json({"ok": True})
+        if t == ["zaehler"]:
+            try:
+                n = int((self._body() or {}).get("anzahl", 1))
+            except (ValueError, AttributeError):
+                n = 1
+            ZAEHLER["stand"] += max(1, min(10, n))
+            ZAEHLER["zeit"] = jetzt()
+            return self._json(ZAEHLER)
+        # Ablage für Testausgaben (z. B. erzeugte PDFs), damit sie sich am PC öffnen lassen.
+        if self.path.startswith("/__ablage/"):
+            ziel = Path(tempfile.gettempdir()) / "maschenwerk-ablage"
+            ziel.mkdir(exist_ok=True)
+            n = int(self.headers.get("Content-Length") or 0)
+            datei = ziel / Path(self.path).name
+            datei.write_bytes(self.rfile.read(n))
+            return self._json({"pfad": str(datei)})
         if len(t) == 3 and t[:2] == ["system", "update"]:
             return self._json({"error": "Das Update über die Seite geht nur im Container."}, 409)
         self._json({"error": "nicht gefunden"}, 404)

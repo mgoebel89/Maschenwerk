@@ -47,7 +47,7 @@
           </a>`;
       };
       return `
-        <div class="seiten-kopf"><h1>Maschenproben</h1><a class="btn btn--pri" href="#/proben/neu${filter ? '?garn=' + encodeURIComponent(filter) : ''}">+ Probe</a></div>
+        <div class="seiten-kopf"><h1>Maschenproben</h1><a class="btn" href="#/garne">Garne</a><a class="btn btn--pri" href="#/proben/neu${filter ? '?garn=' + encodeURIComponent(filter) : ''}">+ Probe</a></div>
         ${fg ? `<p>Nur Proben für <b>${esc(fg.name)}</b> · <a href="#/proben">alle zeigen</a></p>` : ''}
         ${proben.length ? `<div class="liste">${proben.map(zeile).join('')}</div>`
           : MW.ui.leer('Noch keine Maschenproben', 'Strick eine Probe von mindestens 40 Maschen und 60 Reihen, wasch sie und miss sie aus.', '<a class="btn btn--pri" href="#/proben/neu">Erste Probe anlegen</a>')}`;

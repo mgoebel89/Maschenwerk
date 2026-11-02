@@ -135,15 +135,17 @@
   }
 
   // Zu- oder Abnahmen gleichmäßig auf eine Strecke verteilen.
-  // beidseitig: an beiden Rändern gleichzeitig (Ärmel) — ein Ereignis = 2 Maschen.
-  function verteilen(von, bis, reihen, beidseitig) {
+  // proEreignis: true = an beiden Rändern gleichzeitig (Ärmel, 2 Maschen),
+  // eine Zahl = so viele Maschen je Ereignis (Schlauch: 4, je Bett beide Ränder).
+  function verteilen(von, bis, reihen, proEreignis) {
     const a = Math.round(zahl(von) || 0), b = Math.round(zahl(bis) || 0), r = Math.round(zahl(reihen) || 0);
     const diff = Math.abs(b - a);
     if (!diff || !r) return null;
     const art = b > a ? 'Zunahme' : 'Abnahme';
-    const jeEreignis = beidseitig ? 2 : 1;
+    const jeEreignis = typeof proEreignis === 'number' ? proEreignis : proEreignis ? 2 : 1;
+    const beidseitig = jeEreignis > 1;
     if (diff % jeEreignis) {
-      return { fehler: `${diff} Maschen lassen sich nicht gleich auf beide Seiten verteilen. Wähle eine gerade Differenz.` };
+      return { fehler: `${diff} Maschen lassen sich nicht gleichmäßig verteilen (je ${jeEreignis} Maschen auf einmal). Wähle eine passende Differenz.` };
     }
     const ereignisse = diff / jeEreignis;
     if (ereignisse > r) {
@@ -154,7 +156,7 @@
     const schritte = [];
     if (rest) schritte.push({ anzahl: rest, alle: basis + 1 });
     schritte.push({ anzahl: ereignisse - rest, alle: basis });
-    const wo = beidseitig ? ' je Seite 1 Masche' : ' 1 Masche';
+    const wo = jeEreignis === 4 ? ' je Bett an beiden Rändern 1 Masche' : beidseitig ? ' je Seite 1 Masche' : ' 1 Masche';
     const text = schritte.map(s => `${s.anzahl} × alle ${s.alle} Reihen`).join(', dann ');
     // Einfachere Variante: fester Rhythmus, Rest gerade.
     const einfach = `${ereignisse} × alle ${basis} Reihen, danach ${r - ereignisse * basis} Reihen gerade`;

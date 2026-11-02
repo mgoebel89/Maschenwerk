@@ -274,3 +274,70 @@ button { font: inherit; }
 .messblatt-tabelle td { border-bottom: 1px solid #999; padding: 12px 6px; vertical-align: bottom; }
 .messblatt-tabelle td.wert { width: 32%; border-bottom: 1px solid #333; }
 .messblatt-tabelle small { display: block; color: #555; font-size: 11.5px; }
+
+/* ------------------------------------------------------------ Projekte --- */
+.balken { height: 7px; border-radius: 9px; background: #e9e7e2; overflow: hidden; margin-top: 7px; }
+.balken span { display: block; height: 100%; background: var(--pri); border-radius: 9px; }
+.balken--gross { height: 10px; margin: 10px 0 4px; }
+.row-zwischen { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.eintrag--jetzt { border-color: var(--akz); box-shadow: 0 0 0 1px var(--akz) inset, var(--schatten); }
+.flagge { color: var(--warn); font-weight: 700; cursor: help; }
+
+/* ------------------------------------------------------------ Strickmodus --- */
+/* Vollbild, dunkel, große Schrift: das Handy liegt neben der Maschine. */
+body.strickmodus { background: #14272c; }
+body.strickmodus .sidebar, body.strickmodus .kopf-mobil, body.strickmodus .nav-unten { display: none; }
+body.strickmodus .shell { display: block; }
+body.strickmodus .seite { max-width: 640px; padding: 0; }
+.strick { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; color: #eef5f6; padding: env(safe-area-inset-top, 0px) 0 0; }
+.s-kopf { display: flex; align-items: center; gap: 8px; padding: 10px 10px 2px; }
+.s-titel { flex: 1; font-weight: 700; font-size: 15px; color: #fff; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.s-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; color: #8fc6cf; text-decoration: none; font-size: 20px; background: transparent; border: none; cursor: pointer; flex: none; }
+.s-icon:hover { background: #1d3a40; }
+.s-status { padding: 0 16px; font-size: 12px; color: #9fbcc2; min-height: 16px; }
+.s-prog { display: flex; gap: 4px; padding: 8px 16px 12px; }
+.s-prog span { flex: 1; height: 6px; border-radius: 6px; background: #2c4a51; }
+.s-prog span.d { background: #5fb3bf; }
+.s-prog span.c { background: #f0a48f; }
+.s-phase { padding: 0 16px; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: #f0a48f; font-weight: 800; }
+.s-inhalt { flex: 1; padding: 4px 16px 12px; }
+.k-titel { font-size: 26px; font-weight: 800; line-height: 1.2; margin: 6px 0 4px; color: #fff; }
+.k-unter { color: #9fbcc2; font-size: 14px; margin-bottom: 8px; }
+.k-text { font-size: 19px; line-height: 1.5; margin: 12px 0; }
+.k-text b { color: #f0a48f; }
+.k-gross { display: flex; align-items: baseline; gap: 10px; margin: 2px 0; }
+.k-gross span { font-size: 76px; font-weight: 800; letter-spacing: -.03em; line-height: 1; color: #fff; }
+.k-gross small { font-size: 17px; color: #9fbcc2; }
+.k-rc { background: #1d3a40; border-radius: 14px; padding: 10px 14px; display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.k-rc small { display: block; font-size: 12px; color: #9fbcc2; }
+.k-rc b { font-family: ui-monospace, Consolas, monospace; font-size: 22px; color: #fff; }
+.k-rc b.wort { font-family: inherit; font-size: 20px; white-space: nowrap; }
+.k-zaehl { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 14px; color: #9fbcc2; }
+.k-zaehl button { width: 64px; height: 64px; border-radius: 18px; border: none; background: #1d3a40; color: #fff; font-size: 30px; font-weight: 700; cursor: pointer; }
+.chk { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.chk button { display: flex; gap: 12px; align-items: flex-start; text-align: left; background: #1d3a40; color: #eef5f6; border: none; border-radius: 14px; padding: 12px 14px; font-size: 16px; line-height: 1.35; cursor: pointer; }
+.chk button i { font-style: normal; flex: none; width: 24px; height: 24px; border-radius: 7px; border: 2px solid #5fb3bf; display: grid; place-items: center; font-size: 14px; color: #0e2226; font-weight: 800; }
+.chk button.ok i { background: #5fb3bf; }
+.chk button.chg { outline: 2px solid #f0a48f; }
+.chk button b { color: #fff; }
+.chk small { display: block; color: #f0a48f; font-size: 12.5px; margin-top: 2px; }
+.strick .flagge { color: #ffd27a; }
+.bett { background: #1d3a40; border-radius: 14px; padding: 12px 12px 8px; margin-top: 12px; }
+.nadeln { display: flex; gap: 2px; align-items: flex-end; height: 52px; }
+.nadeln span { flex: 1; background: #5fb3bf; border-radius: 1.5px; height: 26px; }
+.nadeln span.e { background: #f0a48f; height: 50px; }
+.nadeln span.z { background: #fff; height: 50px; box-shadow: 0 0 0 2px #f0a48f; }
+.nadeln--rib { height: 14px; margin-top: 8px; }
+.nadeln--rib span { height: 12px; background: #2c4a51; }
+.bett-lab { display: flex; justify-content: space-between; font-size: 11px; color: #9fbcc2; margin-top: 4px; font-family: ui-monospace, Consolas, monospace; }
+.legende { display: flex; gap: 12px; font-size: 11px; color: #9fbcc2; margin-top: 6px; flex-wrap: wrap; }
+.legende i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+.s-fuss { position: sticky; bottom: 0; display: flex; gap: 10px; padding: 12px 14px calc(14px + var(--unten)); background: linear-gradient(to top, #14272c 70%, rgba(20,39,44,0)); }
+.s-zurueck { flex: 0 0 76px; border-radius: 18px; border: none; background: #1d3a40; color: #cfe0e3; font-size: 28px; font-weight: 800; min-height: 68px; cursor: pointer; }
+.s-zurueck:disabled { opacity: .35; }
+.s-weiter { flex: 1; border-radius: 18px; border: none; background: #5fb3bf; color: #0e2226; font-size: 19px; font-weight: 800; min-height: 68px; cursor: pointer; }
+.s-weiter:active { transform: scale(.99); }
+.code { background: #1f2328; color: #e6edf3; border-radius: 10px; padding: 10px 12px; font: 12.5px/1.5 ui-monospace, Consolas, monospace; overflow-x: auto; white-space: pre; }
+details.vorlage { border: 1px solid var(--linie); border-radius: var(--radius-k); padding: 8px 12px; margin-bottom: 8px; background: var(--flaeche-2); }
+details.vorlage summary { cursor: pointer; padding: 4px 0; }
+details.vorlage[open] summary { margin-bottom: 8px; }

@@ -123,7 +123,11 @@
             <h2>Körper</h2>
             <p class="leise">Körpermaße für Pullover kommen mit der Pullovervorlage in Stufe C.</p>
             <h2 style="margin-top:18px">Projekte</h2>
-            <p class="leise">Socken für ${esc(p.name)} legst du ab Stufe B direkt von hier an.</p>
+            ${(() => {
+              const pr = MW.store.liste('projekte').filter(x => x.personId === p.id);
+              return pr.length ? `<div class="liste">${pr.map(MW.projekte.eintrag).join('')}</div>` : `<p class="leise">Noch keine Socken für ${esc(p.name)}.</p>`;
+            })()}
+            <a class="btn btn--pri" style="margin-top:10px" href="#/projekte/neu?person=${encodeURIComponent(p.id)}">🧦 Socken für ${esc(p.name)} anlegen</a>
             ${p.notiz ? `<h2 style="margin-top:18px">Notiz</h2><p style="white-space:pre-wrap">${esc(p.notiz)}</p>` : ''}
           </div>
         </div>`;

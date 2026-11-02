@@ -33,6 +33,8 @@
     tabelle: crud,
     exportieren: () => jsonFetch('/api/export'),
     importieren: (daten) => jsonFetch('/api/import', { method: 'POST', body: daten }),
+    zaehler: () => jsonFetch('/api/zaehler'),
+    zaehlerImpuls: () => jsonFetch('/api/zaehler', { method: 'POST', body: { anzahl: 1 } }),
     system: () => jsonFetch('/api/system'),
     updateAnfordern: (art) => jsonFetch(`/api/system/update/${art}`, { method: 'POST', body: {} }),
   };

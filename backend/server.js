@@ -59,6 +59,20 @@ for (const t of db.TABELLEN) {
   app.use(`/api/${t}`, r);
 }
 
+// --- Rundenzähler ----------------------------------------------------------
+// Ein Sensor am Bettende (Zigbee-Kontakt über Home Assistant oder ESP32)
+// meldet je Runde einen Impuls: POST /api/zaehler. Der Strickmodus fragt den
+// Stand regelmäßig ab und zählt die Differenz. Nur im Speicher — nach einem
+// Neustart beginnt der Stand bei 0, das stört den Vergleich nicht.
+const zaehler = { stand: 0, zeit: null };
+app.get('/api/zaehler', (_req, res) => res.json(zaehler));
+app.post('/api/zaehler', (req, res) => {
+  const n = parseInt((req.body && req.body.anzahl) || 1, 10);
+  zaehler.stand += Math.max(1, Math.min(10, isFinite(n) ? n : 1));
+  zaehler.zeit = new Date().toISOString();
+  res.json(zaehler);
+});
+
 // --- Export / Import -------------------------------------------------------
 app.get('/api/export', (_req, res) => {
   const stamp = new Date().toISOString().slice(0, 10);

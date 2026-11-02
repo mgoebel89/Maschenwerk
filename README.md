@@ -6,18 +6,23 @@ Reihe für Reihe abarbeiten. Läuft als kleiner LXC-Container auf Proxmox, bedie
 
 Konzept mit Ansichten: [`KONZEPT.html`](KONZEPT.html) · Stand und Entscheidungen: [`STAND_UND_KONZEPT.md`](STAND_UND_KONZEPT.md)
 
-## Stand: Stufe A (Fundament)
+## Stand: Stufe B (Socken)
 
-- **Personen** mit Fußmaßen; **Messmaske** mit Fußzeichnung (Messlinie leuchtet, Hinweis je Maß,
-  Plausibilitätsprüfung gegen die Schuhgröße); fehlende Maße werden aus der Schuhgröße geschätzt;
-  **Messblatt** zum Ausdrucken
-- **Garne** mit Lauflänge, Gewicht, Farbe
-- **Maschenproben** flach oder rund (Doppelbett), gezählt + gemessen oder direkt auf 10 cm
-- **Schnellrechner**: Breite → Maschen und Nadeln (L/R, je Bett), Länge → Reihen/Runden und
-  Reihenzähler, Maschen/Reihen → cm, Zu- und Abnahmen gleichmäßig verteilen
-- **Datensicherung** als Datei, nächtliche Sicherung im Container, **Update auf Knopfdruck**
+- **Personen** mit Fußmaßen und **Messmaske** (Fußzeichnung, Hinweis je Maß, Plausibilitätsprüfung,
+  Schätzung aus der Schuhgröße, Messblatt zum Drucken)
+- **Garne** und **Maschenproben** (flach oder rund), **Schnellrechner**
+- **Sockenvorlage** rund auf dem Doppelbett: Bündchen 2:2/2:1/1:1/Mock-Rib, drei Fersen-/Spitzenformen
+  (verkürzte Reihen nur auf dem Hauptbett), optionale Wadenabnahme, Spitze im Maschenstich
+- **Projekt-Assistent** mit Live-Ergebnis und Garnbedarf; Projekte frieren Maße und Anleitung ein
+- **Strickmodus**: Checkliste vor jedem Abschnitt, gerade Strecken als Block, verkürzte Reihen einzeln
+  mit Nadelbett-Grafik, Reihenzähler-Soll, Bildschirm bleibt an, Weiter per Knopf, Bluetooth-Seitenwender
+  (Leertaste/Pfeil/Bild↓) oder **Rundenzähler-Sensor** (`POST /api/zaehler`, z. B. aus Home Assistant)
+- **Maschineneinstellungen** auf drei Ebenen: je Abschnitt, Änderungen beim Stricken (gelten für Socke 2),
+  bearbeitbare **Einstellungs-Vorlagen** (dort die Hebelnamen aus den Anleitungen eintragen, ⚑ = Platzhalter)
+- **PDF-Anleitung** mit Skizze, Ablauf zum Abhaken, Nadelfolge der verkürzten Reihen
+- Datensicherung, nächtliche Sicherung, Update auf Knopfdruck
 
-Als Nächstes: Stufe B — Sockenvorlage, Projekt-Assistent, Strickmodus, PDF.
+Als Nächstes: Stufe C — Pullover (eingesetzte Ärmel, Raglan, überschnittene Schulter).
 
 ## Installation (Proxmox-Shell)
 

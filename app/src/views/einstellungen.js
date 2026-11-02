@@ -110,6 +110,51 @@
               <tr><td>Nadeln</td><td>je Seite 1–${M.MASCHINE.nadelnJeSeite} (L/R)</td></tr>
             </table>
           </div>
+          <div class="karte" id="vorlagen">
+            <h2>Einstellungs-Vorlagen</h2>
+            <p class="leise klein">Diese Texte erscheinen im Strickmodus in der Checkliste vor jedem Abschnitt. Mit ⚑ markierte Stellen sind Platzhalter — hier die genauen Hebelnamen aus den Anleitungen von KH-588 und KR-586 eintragen. Änderungen gelten sofort, auch für laufende Projekte.</p>
+            ${Object.entries(s.einstellungsVorlagen || {}).map(([k, v]) => `
+              <details class="vorlage" data-vorlage="${esc(k)}">
+                <summary><b>${esc(v.name)}</b>${/⚑/.test(Object.values(v).join(' ')) ? ' <span class="flagge">⚑</span>' : ''}</summary>
+                ${feld({ name: `${k}.name`, label: 'Name', wert: v.name })}
+                ${feld({ name: `${k}.hauptschlitten`, label: 'Hauptschlitten', wert: v.hauptschlitten })}
+                ${feld({ name: `${k}.ribber`, label: 'Ribber', wert: v.ribber })}
+                ${feld({ name: `${k}.gewichte`, label: 'Gewichte', wert: v.gewichte })}
+                ${feld({ name: `${k}.hinweis`, label: 'Hinweis', wert: v.hinweis })}
+              </details>`).join('')}
+            <button class="btn btn--pri" data-vorlagen style="margin-top:10px">Vorlagen speichern</button>
+            <h2 style="margin-top:20px">Verkürzte Reihen</h2>
+            <p class="leise klein">So formuliert die Anleitung Ferse und Spitze. Gilt für neu angelegte Projekte.</p>
+            ${MW.ui.auswahl({ name: 'abnahme', label: 'Abnahme: Nadel nach E bringen auf der …', wert: s.verkuerzt.abnahme, optionen: [{ wert: 'schlitten', label: 'Seite des Schlittens' }, { wert: 'gegenueber', label: 'Seite gegenüber dem Schlitten' }] })}
+            ${MW.ui.auswahl({ name: 'zunahme', label: 'Zunahme: Nadel aus E zurückholen auf der …', wert: s.verkuerzt.zunahme, optionen: [{ wert: 'gegenueber', label: 'Seite gegenüber dem Schlitten' }, { wert: 'schlitten', label: 'Seite des Schlittens' }] })}
+            <button class="btn" data-verkuerzt>Speichern</button>
+          </div>
+          <div class="karte">
+            <h2>Rundenzähler (Sensor)</h2>
+            <label class="check"><input type="checkbox" name="sensorAktiv" ${s.sensor.aktiv ? 'checked' : ''}> Im Strickmodus auf Sensor-Impulse hören</label>
+            <p class="leise klein">Ein Sensor am Bettende meldet je Runde einen Impuls an diese Adresse. Der Strickmodus zählt damit gerade Strecken automatisch mit und hält vor jeder Aktion an.</p>
+            <pre class="code">POST ${esc(location.origin)}/api/zaehler</pre>
+            <details><summary class="klein">Beispiel für Home Assistant</summary>
+<pre class="code">rest_command:
+  maschenwerk_runde:
+    url: "${esc(location.origin)}/api/zaehler"
+    method: POST
+    verify_ssl: false
+
+automation:
+  - alias: Strickmaschine Runde
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.strickmaschine_kontakt
+        to: "on"
+    action:
+      - service: rest_command.maschenwerk_runde</pre></details>
+            <div class="knopfzeile">
+              <button class="btn" data-sensor>Speichern</button>
+              <button class="btn" data-impuls>Testimpuls senden</button>
+            </div>
+            <p class="leise klein" id="impulsStand"></p>
+          </div>
           <div class="karte">
             <h2>Datensicherung</h2>
             <p class="leise klein">Der Container sichert jede Nacht die Datenbank. Zusätzlich kannst du hier alles als Datei herunterladen und wieder einspielen.</p>
@@ -129,6 +174,32 @@
         const w = MW.ui.formWerte(root);
         MW.store.settingsSpeichern({ ...MW.store.settings(), weiteSocken: M.zahl(w.weiteSocken) ?? -10 });
         MW.ui.toast('Gespeichert', 'ok');
+      });
+      root.querySelector('[data-vorlagen]').addEventListener('click', () => {
+        const s = MW.store.settings();
+        const vorlagen = JSON.parse(JSON.stringify(s.einstellungsVorlagen));
+        root.querySelectorAll('[data-vorlage] input[name]').forEach(el => {
+          const [k, feldName] = el.name.split('.');
+          if (vorlagen[k]) vorlagen[k][feldName] = el.value.trim();
+        });
+        MW.store.settingsSpeichern({ ...s, einstellungsVorlagen: vorlagen });
+        MW.ui.toast('Vorlagen gespeichert', 'ok');
+      });
+      root.querySelector('[data-verkuerzt]').addEventListener('click', () => {
+        const s = MW.store.settings();
+        MW.store.settingsSpeichern({ ...s, verkuerzt: { abnahme: root.querySelector('[name=abnahme]').value, zunahme: root.querySelector('[name=zunahme]').value } });
+        MW.ui.toast('Gespeichert', 'ok');
+      });
+      root.querySelector('[data-sensor]').addEventListener('click', () => {
+        const s = MW.store.settings();
+        MW.store.settingsSpeichern({ ...s, sensor: { ...s.sensor, aktiv: root.querySelector('[name=sensorAktiv]').checked } });
+        MW.ui.toast('Gespeichert', 'ok');
+      });
+      root.querySelector('[data-impuls]').addEventListener('click', async () => {
+        try {
+          const z = await MW.api.zaehlerImpuls();
+          root.querySelector('#impulsStand').textContent = `Impuls angekommen — Zählerstand ${z.stand}.`;
+        } catch (e) { MW.ui.toast(e.message, 'fehler'); }
       });
       root.querySelector('[data-export]').addEventListener('click', exportieren);
       root.querySelector('[data-import]').addEventListener('change', (e) => {

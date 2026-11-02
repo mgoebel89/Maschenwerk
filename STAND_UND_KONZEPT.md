@@ -18,8 +18,28 @@ Runde abzuarbeiten. Hauptsächlich **Socken** (für verschiedene Personen in der
   `pct exec 119 -- update` funktioniert, Matthias: „läuft soweit alles". **Stufe A im Container abgenommen.**
   Fixes beim Installieren: `de9a6f6` (nginx-Standardseite, CT_HOSTNAME), `93b9b79` (alle IPs ins Zertifikat),
   `36e5cc0` (Befehle auch in /usr/bin, weil pct exec /usr/local nicht im PATH hat).
-- Nächstes: Stufe B (Rundsocke, Projekt-Assistent, Strickmodus, PDF). Dafür gebraucht: Seiten der
-  KR-586-Anleitung zu Rundstricken und Ribberschloss-Einstellungen.
+- **Stufe B gebaut (Version 0.2.0)**, lokal im Browser-Pane durchgetestet, noch NICHT im Container.
+  Hebelnamen von KH-588/KR-586 stehen weiter als Platzhalter ⚑ in den Einstellungs-Vorlagen
+  (Einstellungen → Vorlagen); Matthias kann sie dort selbst eintragen.
+
+## Stufe B – was drin ist
+- `app/src/socke.js`: Berechnung + Anleitung. RC: Rippe 1 Fahrt/Reihe, rund 2 Fahrten/Runde, verkürzt 1/Reihe.
+  Maschen = rundeAuf(Umfang × (1+Weite) × M/cm, kgV(Rapport, 2)); Ferse/Spitze verkürzt bis Rest-Anteil
+  (⅓ bzw. ⅖, ggf. + 2 Zwischenreihen), (F−Rest) gerade erzwungen; Tiefe = (ab + zw/2)/R-pro-cm;
+  Schaft = Schafthöhe − Bündchen − Fersentiefe; Fuß = Sockenlänge − Fersen- − Spitzentiefe.
+  Wadenabnahme: 4 Maschen je Abnahmerunde (je Bett beide Ränder), per `verteilen(…, 4)`.
+  Garn ≈ Maschen × 2,3 × (Maschenbreite + Maschenhöhe).
+- Verkürzte Reihen: Abnahme Nadel auf Schlittenseite nach E, Zunahme gegenüber zurück nach D —
+  **einstellbar** (Einstellungen), weil die Literatur das unterschiedlich beschreibt. Schlitten startet rechts.
+- Projekt = eingefrorene Eingaben + Anleitung; Fortschritt = Index in `MW.socke.karten()` (+ gezählte Runden).
+  Vorlagen werden LIVE aus den Settings gelesen (nachgetragene Hebelnamen gelten sofort), Änderungen
+  je Abschnitt in `projekt.aenderungen` (gelten ab sofort und für Socke 2).
+- Strickmodus `views/stricken.js`: Wake Lock, Piep + Vibration, Tasten (Bluetooth-Seitenwender),
+  Sensor-Abfrage `/api/zaehler` alle 1,5 s — zählt nur in Blöcken, bei Aktionen nur Piep.
+- PDF `export/pdf.js` mit jsPDF aus der ImkereiApp (`app/vendor/`); Helvetica kann nur WinAnsi →
+  `MW.pdf.rein()` ersetzt ≈ → − ⚑ ⅓.
+- Test-Hilfen im dev_server: `/__backend/<datei>` (Syntaxprüfung) und `POST /__ablage/<name>` (PDF ablegen,
+  landet in `%TEMP%\maschenwerk-ablage`, dann mit Read ansehen).
 - Lokal geprüft (Browser-Pane, `tests/dev_server.py`, Launch-Config `maschenwerk-dev` Port 8470):
   Person anlegen → Messmaske (Schritte, Tippen auf Linie, Speichern beim sofortigen Verlassen,
   Plausibilitätswarnung), Garn, Probe rund (40 M/13,3 cm, 60 Rd/14,3 cm → 30,1 M / 42 Rd),

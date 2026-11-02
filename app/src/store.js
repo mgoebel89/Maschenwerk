@@ -22,13 +22,26 @@
     return {
       schemaVersion: MW.models.SCHEMA_VERSION,
       weiteSocken: -10,      // negative Weite in %, Vorgabe für neue Personen
+      // Einstellungs-Vorlagen (Hebel, Ribber, Gewichte) je Arbeitsweise — hier
+      // pflegt Matthias die echten Bezeichnungen aus den Anleitungen ein.
+      einstellungsVorlagen: JSON.parse(JSON.stringify(MW.socke.VORLAGEN)),
+      verkuerzt: { ...MW.socke.VERKUERZT_STANDARD },
+      sensor: { aktiv: true },
     };
   }
 
   async function laden() {
     const snap = await MW.api.snapshot();
     for (const t of TABELLEN) cache[t] = Array.isArray(snap[t]) ? snap[t] : [];
-    cache.settings = { ...defaultSettings(), ...(snap.settings || {}) };
+    const d = defaultSettings(), s = snap.settings || {};
+    // Verschachtelte Vorgaben einzeln ergänzen, damit neue Vorlagen auch bei
+    // bestehenden Settings auftauchen.
+    cache.settings = {
+      ...d, ...s,
+      einstellungsVorlagen: { ...d.einstellungsVorlagen, ...(s.einstellungsVorlagen || {}) },
+      verkuerzt: { ...d.verkuerzt, ...(s.verkuerzt || {}) },
+      sensor: { ...d.sensor, ...(s.sensor || {}) },
+    };
     cache.version = snap.version || '';
     cache.ready = true;
     notify();
