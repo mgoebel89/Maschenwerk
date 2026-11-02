@@ -1,0 +1,10 @@
+# Knopf „Nach Update suchen" in der App.
+[Unit]
+Description=Maschenwerk: Update-Prüfung auf Knopfdruck
+
+[Path]
+PathExists=/var/lib/maschenwerk/update/pruefen
+Unit=maschenwerk-update-pruefen.service
+
+[Install]
+WantedBy=multi-user.target

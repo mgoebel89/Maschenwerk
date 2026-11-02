@@ -1,0 +1,65 @@
+# Maschenwerk – Stand und Konzept
+
+Projektgedächtnis, lokal auf diesem PC. Wird nach jeder Arbeitsrunde fortgeschrieben.
+Ausführliches Konzept mit Ansichten-Entwürfen: `KONZEPT.html`.
+
+## Ziel
+LXC-Container auf dem Proxmox **192.168.5.40**: Web-App, um Strickanleitungen für die
+**Brother KH-588** mit Doppelbett zu berechnen, zu speichern und Reihe für Reihe bzw. Runde für
+Runde abzuarbeiten. Hauptsächlich **Socken** (für verschiedene Personen in deren Größe) und
+**Pullover**. Nadel- und Reihenzahlen werden aus der **Maschenprobe** berechnet. Anleitungen als
+**PDF** druckbar. Modernes Design, auf iPhone und Android bequem.
+
+## Stand 2026-11-02
+- Konzept geschrieben und Funktionsumfang in drei Fragerunden abgestimmt.
+- **Noch nichts gebaut**, kein Repo, kein Container.
+- Nächster Schritt: Stufe A (Fundament) bauen.
+
+## Entscheidungen (2026-11-02)
+| Thema | Entscheidung |
+|---|---|
+| Maschine | KH-588 **ohne Lochkartenleser**: 8 Tasten zur Nadelvorwahl + Handauswahl (Nadeln nach D). Doppelbett **vorhanden: Brother KR-586**. |
+| Socken | **rund auf dem Doppelbett** (Schlauch). 1 Runde = 2 Schlittenfahrten = RC +2. Maschenzahl rundherum, halbe je Bett. |
+| Bündchen | wählbar: 1:1 Doppelbett, 2:1/2:2 Doppelbett, Mock-Rib einbettig |
+| Ferse/Spitze | **mehrere Formen je Projekt wählbar** (Start: Bumerang in verkürzten Reihen nur auf dem Hauptbett, Ribber ruht) |
+| Spitzenschluss | Hilfsgarn + **Maschenstich (Kitchener)**, App zeigt Kurzanleitung |
+| Strickmodus | **gemischt**: Aktionen (Ferse, Umstellen) reihenweise, gerade Strecken als Block |
+| Weiterzählen | **Knopf zuerst**, Zählschnittstelle (Webhook, z. B. `POST /api/zaehler`) gleich mitbauen; Sensor später: Zigbee-Kontakt am Bettende über Home Assistant **oder** ESP32/ESPHome mit Reed/Hall. Vor Aktionen hält die App an und piept; ±1-Korrektur. |
+| Pullover | eingesetzte Ärmel, Raglan, überschnittene Schulter |
+| Muster | Muster-Assistent für die 8 Vorwahltasten + Handauswahl, **Stufe E** |
+| Garne | Garne (Lauflänge, Gewicht, Farbe) + Garnbedarf je Projekt, **kein Vorrat** |
+| Zugriff | nur Matthias, nur Heimnetz, **kein Login** |
+| Installation | **Einzeiler in der Proxmox-Shell** von 192.168.5.40; Update per `update` im Container + Knopf in den Einstellungen |
+| Design | **Petrol `#23606e` + Wollrot `#c2553a`**, helle Oberfläche, dunkler Strickmodus |
+| Name | **Maschenwerk** |
+
+## Technik (vorgeschlagen, nicht widersprochen)
+Wie ImkereiApp: Debian-12-LXC, Node + Express + better-sqlite3, Vanilla-JS-Frontend als PWA,
+nginx mit selbstsigniertem HTTPS (Wake Lock braucht secure context; auf Debian 12
+`listen 443 ssl http2;`, nicht `http2 on;`), PDF per jsPDF im Browser, nächtliches DB-Backup.
+
+## Stufen
+- **A** Fundament: Container, Installer, Update, Design, Personen, Garne, Maschenproben, Schnellrechner
+- **B** Rundsocke, Projekt-Assistent, Strickmodus mit Zählschnittstelle, PDF → arbeitsfähig
+- **C** Pullover (3 Schnitte), verteilte Zu-/Abnahmen, Schnittskizze im PDF
+- **D** Sensor, Ist-Maße/Kalibrierung, Garnbedarf, Statistik
+- **E** Muster-Assistent (8 Vorwahltasten + Handauswahl)
+
+## Offen
+- Belegung der 8 Vorwahltasten (Foto der Tasten oder der Anleitungsseite), spätestens zu Stufe E
+- Ribber ist **KR-586** (2026-11-02). Noch offen: Hebelbezeichnungen, Rundstrick-Einstellung,
+  Versatz-Skala, Maschenweitenbereich des Ribberschlosses aus der Bedienungsanleitung übernehmen
+  (Foto/PDF der Seiten) — nicht raten. Übergang Rippenbündchen → Schlauch beim Bau der Sockenvorlage klären.
+
+## Ergänzungen 2026-11-02 (ins Konzept übernommen, inkl. Mockups Messmaske + Checkliste)
+- Maschineneinstellungen auf drei Ebenen: je Abschnitt geplant (MW Haupt/Ribber, Hebel, Tasten,
+  Ribberschloss, Racking, Nadelanordnung, Gewichte, Fadenspanner, Garn) als Checkliste beim
+  Abschnittswechsel · je Projekt tatsächlich gestrickt (Änderungen wirken auf Socke 2) ·
+  benannte Einstellungs-Vorlagen
+- Messmaske mit Fußzeichnung (Seite + oben), Messlinie leuchtet beim Feld auf, Hinweistexte je Maß,
+  Plausibilitätsprüfung gegen Schuhgröße, Messblatt als PDF
+- Rechenweg ausführlich im Konzept; Maschenprobe flach/rund unterscheiden (Socken bevorzugt runde
+  Probe); optionale Wadenabnahme im Schaft
+- Schuhgröße nur als Schätzung: Fußlänge ≈ Größe × 2/3 cm − 1,5 cm; Umfang nicht aus der Größe ableitbar
+- Container-Nummer (CTID) und feste IP
+- GitHub-Repo (Name, öffentlich/privat), Matthias legt es an

@@ -1,0 +1,10 @@
+# Update aus der App: Sicherung, maschenwerk-update, danach erneut prüfen (als root).
+[Unit]
+Description=Maschenwerk: Update ausführen
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/maschenwerk-selbstupdate ausfuehren
+TimeoutStartSec=20min

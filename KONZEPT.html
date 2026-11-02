@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maschenwerk – Konzept</title>
+<style>
+  :root{
+    --bg:#f5f4f1; --surface:#ffffff; --ink:#1f2328; --muted:#5f6670; --line:#e3e0da;
+    --pri:#23606e; --pri-soft:#e3eff1; --acc:#c2553a; --acc-soft:#fbeae5;
+    --ok:#2f7d4f; --ok-soft:#e4f3ea; --warn:#a46a00; --warn-soft:#fdf2dc;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 16px 80px}
+  header.hero{display:flex;gap:20px;align-items:center;margin-bottom:28px}
+  .logo{width:64px;height:64px;border-radius:18px;background:var(--pri);display:grid;place-items:center;flex:none}
+  h1{margin:0;font-size:30px;letter-spacing:-.02em}
+  h2{font-size:22px;margin:44px 0 12px;letter-spacing:-.01em;display:flex;gap:10px;align-items:baseline}
+  h2 .n{color:var(--pri);font-variant-numeric:tabular-nums}
+  h3{font-size:17px;margin:20px 0 8px}
+  p{margin:6px 0 10px}
+  .sub{color:var(--muted)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;overflow-x:auto}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:13px;background:var(--pri-soft);color:var(--pri);font-weight:600}
+  .pill.acc{background:var(--acc-soft);color:var(--acc)}
+  .pill.ok{background:var(--ok-soft);color:var(--ok)}
+  .pill.warn{background:var(--warn-soft);color:var(--warn)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:13px}
+  code,.mono{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em}
+  .formula{background:var(--pri-soft);border-radius:10px;padding:10px 14px;font-family:ui-monospace,Consolas,monospace;font-size:14px;line-height:1.7;overflow-x:auto}
+  ul{margin:6px 0;padding-left:20px}
+  li{margin:3px 0}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14.5px}
+  .flow .box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:600}
+  .flow .arr{color:var(--muted)}
+
+  /* ---------- Mockups ---------- */
+  .mocks{display:flex;flex-wrap:wrap;gap:28px;justify-content:center;margin-top:10px}
+  .mock{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .mock .cap{font-size:14px;color:var(--muted);max-width:310px;text-align:center}
+  .mock .cap b{color:var(--ink)}
+  .phone{width:min(300px,100%);height:620px;border-radius:38px;background:#111;padding:10px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+  .screen{width:100%;height:100%;border-radius:30px;background:#f7f7f5;overflow:hidden;display:flex;flex-direction:column;font-size:13.5px;position:relative}
+  .sbar{height:26px;display:flex;justify-content:space-between;align-items:center;padding:0 22px;font-size:11px;font-weight:600;color:#222;flex:none}
+  .appbar{display:flex;align-items:center;gap:8px;padding:6px 14px 10px;flex:none}
+  .appbar .t{font-weight:700;font-size:17px}
+  .appbar .back{color:var(--pri);font-size:20px;line-height:1}
+  .body{flex:1;overflow:hidden;padding:0 12px}
+  .tabbar{display:flex;justify-content:space-around;border-top:1px solid #e6e4df;background:#fff;padding:7px 0 14px;flex:none}
+  .tabbar div{font-size:10px;color:#8a8f96;display:flex;flex-direction:column;align-items:center;gap:2px}
+  .tabbar div.on{color:var(--pri);font-weight:700}
+  .tabbar i{font-style:normal;font-size:17px}
+  .tile{background:#fff;border-radius:14px;padding:11px 12px;margin-bottom:9px;border:1px solid #ebe9e4}
+  .tile .h{font-weight:700}
+  .tile .s{font-size:12px;color:var(--muted)}
+  .bar{height:7px;border-radius:9px;background:#e9e7e2;overflow:hidden;margin-top:7px}
+  .bar span{display:block;height:100%;background:var(--pri)}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .chip{font-size:11px;padding:2px 8px;border-radius:9px;background:var(--pri-soft);color:var(--pri);font-weight:600;white-space:nowrap}
+  .chip.acc{background:var(--acc-soft);color:var(--acc)}
+  .sect{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:12px 2px 6px}
+  .avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none}
+  .fld{background:#fff;border:1px solid #e3e0da;border-radius:10px;padding:6px 10px;margin-bottom:7px}
+  .fld .l{font-size:10.5px;color:var(--muted)}
+  .fld .v{font-weight:600;font-size:14px}
+  .seg{display:flex;background:#ecebe7;border-radius:10px;padding:3px;margin-bottom:9px}
+  .seg div{flex:1;text-align:center;padding:5px 0;border-radius:8px;font-size:12px;color:var(--muted);font-weight:600}
+  .seg div.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+  .btn{background:var(--pri);color:#fff;border-radius:12px;text-align:center;padding:11px;font-weight:700}
+  .btn.ghost{background:#fff;color:var(--pri);border:1px solid #cfe0e3}
+  .res{background:var(--pri);color:#fff;border-radius:14px;padding:12px;margin-bottom:9px}
+  .res .big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .res .s{font-size:11.5px;opacity:.85}
+
+  /* knit mode */
+  .knit{background:#14272c;color:#eef5f6}
+  .knit .sbar{color:#cfe0e3}
+  .knit .appbar .t{color:#fff;font-size:14px}
+  .knit .appbar .back{color:#8fc6cf}
+  .kprog{display:flex;gap:3px;padding:0 14px 10px}
+  .kprog span{flex:1;height:5px;border-radius:5px;background:#2c4a51}
+  .kprog span.d{background:#5fb3bf}
+  .kprog span.c{background:#f0a48f}
+  .kphase{padding:0 16px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#f0a48f;font-weight:700}
+  .krow{padding:2px 16px 0;display:flex;align-items:baseline;gap:8px}
+  .krow .big{font-size:56px;font-weight:800;letter-spacing:-.03em;line-height:1}
+  .krow .of{font-size:15px;color:#9fbcc2}
+  .krc{margin:8px 16px;background:#1d3a40;border-radius:12px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
+  .krc .l{font-size:11px;color:#9fbcc2}
+  .krc .v{font-family:ui-monospace,Consolas,monospace;font-size:22px;font-weight:700;color:#fff}
+  .kinst{margin:6px 16px;font-size:15px;line-height:1.45}
+  .kinst b{color:#f0a48f}
+  .bed{margin:8px 16px 0;background:#1d3a40;border-radius:12px;padding:10px 10px 6px}
+  .needles{display:flex;gap:1px;align-items:flex-end;height:46px}
+  .needles span{flex:1;background:#5fb3bf;border-radius:1px;height:24px}
+  .needles span.a{background:#2c4a51;height:10px}
+  .needles span.e{background:#f0a48f;height:44px}
+  .needles span.z{background:#ffffff}
+  .needles.rib{height:12px;margin-top:6px}
+  .needles.rib span{height:10px;background:#2c4a51}
+  .bedlab{display:flex;justify-content:space-between;font-size:10px;color:#9fbcc2;margin-top:4px;font-family:ui-monospace,Consolas,monospace}
+  .legend{display:flex;gap:10px;font-size:10px;color:#9fbcc2;margin-top:4px}
+  .legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:3px;vertical-align:middle}
+  .kbtns{margin-top:auto;padding:12px 14px 18px;display:flex;gap:10px}
+  .kbtns div{border-radius:16px;text-align:center;font-weight:800;padding:16px 0}
+  .kbtns .bk{flex:0 0 74px;background:#1d3a40;color:#cfe0e3}
+  .kbtns .go{flex:1;background:#5fb3bf;color:#0e2226;font-size:17px}
+
+  /* desktop + pdf */
+  .desk{width:min(100%,760px);border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 12px 30px rgba(0,0,0,.10);overflow:hidden;font-size:13px}
+  .desk .top{height:30px;background:#ecebe7;display:flex;align-items:center;gap:6px;padding:0 12px}
+  .desk .top i{width:10px;height:10px;border-radius:50%;background:#d0cdc6;display:inline-block}
+  .desk .top span{margin-left:14px;font-size:11px;color:var(--muted);background:#fff;border-radius:6px;padding:2px 10px}
+  .dgrid{display:grid;grid-template-columns:160px 1fr 1fr}
+  .dnav{background:#f7f6f3;border-right:1px solid var(--line);padding:12px 10px;min-height:400px}
+  .dnav div{padding:6px 9px;border-radius:8px;margin-bottom:2px;color:var(--muted);font-weight:600}
+  .dnav div.on{background:var(--pri-soft);color:var(--pri)}
+  .dpane{padding:14px 16px}
+  .dpane + .dpane{border-left:1px solid var(--line);background:#fbfbfa}
+  .steps{display:flex;gap:6px;margin-bottom:12px}
+  .steps span{font-size:11px;padding:3px 9px;border-radius:9px;background:#ecebe7;color:var(--muted);font-weight:600}
+  .steps span.on{background:var(--pri);color:#fff}
+  .steps span.done{background:var(--pri-soft);color:var(--pri)}
+  .sock{display:block;margin:4px auto 6px}
+  .pdf{width:min(100%,430px);aspect-ratio:210/297;background:#fff;box-shadow:0 12px 30px rgba(0,0,0,.14);border:1px solid var(--line);padding:26px 26px;font-size:9.5px;line-height:1.4;overflow:hidden}
+  .pdf h4{margin:0;font-size:15px}
+  .pdf .meta{color:var(--muted);margin-bottom:8px}
+  .pdf table{font-size:9px}
+  .pdf th,.pdf td{padding:3px 4px}
+  .pdf .box{display:inline-block;width:9px;height:9px;border:1px solid #888;border-radius:2px;vertical-align:middle}
+  .pc{display:grid;grid-template-columns:repeat(24,1fr);gap:1px;background:#d9d6cf;padding:1px;border-radius:4px}
+  .pc span{aspect-ratio:1;background:#fff}
+  .pc span.x{background:var(--acc)}
+  .steps-list{counter-reset:st;list-style:none;padding:0;margin:8px 0}
+  .steps-list li{counter-increment:st;position:relative;padding:8px 0 8px 40px;border-bottom:1px solid var(--line)}
+  .steps-list li:last-child{border-bottom:none}
+  .steps-list li::before{content:counter(st);position:absolute;left:0;top:8px;width:28px;height:28px;border-radius:50%;background:var(--pri);color:#fff;font-weight:700;display:grid;place-items:center;font-size:14px}
+  .note{border-left:4px solid var(--acc);background:var(--acc-soft);border-radius:0 10px 10px 0;padding:10px 14px;margin:10px 0}
+  .lvl{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:12px}
+  .lvl .card{position:relative;padding-top:40px}
+  .lvl .tag{position:absolute;top:12px;left:20px}
+  .footsvg{background:#fff;border:1px solid #ebe9e4;border-radius:14px;padding:6px;margin-bottom:8px}
+  .fld.on{border:2px solid var(--acc);background:var(--acc-soft)}
+  .hint{font-size:11.5px;color:#7a3a28;margin-top:3px;line-height:1.35}
+  .mini{display:grid;grid-template-columns:1fr 1fr;gap:0 6px}
+  .mini .fld{padding:4px 8px;margin-bottom:5px}
+  .mini .fld .v{font-size:12.5px}
+  .chk{margin:6px 16px 0;display:flex;flex-direction:column;gap:7px}
+  .chk div{background:#1d3a40;border-radius:12px;padding:9px 12px;display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.35}
+  .chk div i{font-style:normal;flex:none;width:20px;height:20px;border-radius:6px;border:2px solid #5fb3bf;display:grid;place-items:center;font-size:12px;color:#0e2226}
+  .chk div.ok i{background:#5fb3bf}
+  .chk div.chg{outline:2px solid #f0a48f}
+  .chk small{display:block;color:#9fbcc2;font-size:11px}
+  @media (max-width:720px){
+    .dgrid{grid-template-columns:1fr}
+    .dnav{display:none}
+    .dpane + .dpane{border-left:none;border-top:1px solid var(--line)}
+    h1{font-size:24px}
+  }
+  .q{counter-increment:q;position:relative;padding-left:40px}
+  .q::before{content:counter(q);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;font-weight:700;display:grid;place-items:center;font-size:14px}
+  .qs{counter-reset:q;display:grid;gap:14px}
+  .q .opt{font-size:14px;color:var(--muted)}
+  footer{margin-top:50px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="logo">
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round">
+      <path d="M8 10 C8 20 14 22 20 22 C26 22 32 20 32 10"/>
+      <path d="M8 20 C8 30 14 32 20 32 C26 32 32 30 32 20"/>
+      <line x1="20" y1="4" x2="20" y2="36" stroke-width="2" opacity=".55"/>
+    </svg>
+  </div>
+  <div>
+    <h1>Maschenwerk</h1>
+    <div class="sub">Konzept: Strickmuster für die Brother KH-588 berechnen, speichern und Reihe für Reihe abarbeiten · Stand 02.11.2026 · Funktionsumfang im Dialog abgestimmt</div>
+  </div>
+</header>
+
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:0">Worum es geht</h3>
+    <p>Eine kleine Web-App für dich allein, im Heimnetz, in einem eigenen LXC-Container auf deinem Proxmox (<span class="mono">192.168.5.40</span>). Du hinterlegst <b>Personen mit ihren Maßen</b> und deine <b>Maschenproben</b>. Daraus rechnet die App für eine <b>Socke oder einen Pullover</b> alle Maschen-, Nadel- und Reihenzahlen aus und erzeugt eine Anleitung.</p>
+    <p>Socken strickst du <b>rund auf dem Doppelbett</b>. Beim Stricken führt dich ein <b>Strickmodus</b> am Handy durch jede Runde bzw. jeden Rundenblock, mit Sollstand für den Reihenzähler und einer kleinen Grafik des Nadelbetts. Jede Anleitung lässt sich als <b>PDF</b> drucken.</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Leitlinien</h3>
+    <ul>
+      <li><b>Maße rein, Nadeln raus:</b> du gibst nie selbst Maschenzahlen ein, die App rechnet sie aus (überschreiben bleibt möglich).</li>
+      <li><b>Reihe für Reihe statt Textwüste:</b> beim Stricken siehst du nur, was jetzt dran ist.</li>
+      <li><b>Handy zuerst:</b> große Knöpfe, mit einer Hand bedienbar, Bildschirm bleibt an.</li>
+      <li><b>Später automatisch:</b> ein Sensor am Bettende (Zigbee über Home Assistant oder ESP32) zählt die Runden mit.</li>
+      <li><b>Lernt mit:</b> nach dem ersten Paar trägst du die Ist-Maße ein, damit die nächste Berechnung genauer wird.</li>
+      <li><b>Bewährter Aufbau</b> wie bei ImkereiApp und Gemeindeverwaltung: Installation per Einzeiler, Update per Befehl.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="n">1</span> Die Maschine im Modell</h2>
+<p class="sub">Damit die Anweisungen zu deiner KH-588 passen, kennt die App ihre Eigenheiten. Korrigiert nach deinen Antworten:</p>
+<div class="card">
+<table>
+  <tr><th style="width:32%">Merkmal</th><th>Annahme im Konzept</th><th style="width:22%">Wirkung in der App</th></tr>
+  <tr><td>Nadelbett</td><td>Standardteilung 4,5 mm, 200 Nadeln, nummeriert links und rechts der Mitte jeweils 1–100</td><td>Anweisungen wie <span class="mono">L31 – R31</span>, Warnung bei mehr als 200 Maschen</td></tr>
+  <tr><td>Nadelstellungen</td><td>A (außer Arbeit), B (Arbeit), D (vorgezogen), E (Halteposition)</td><td>Grafik und Text nennen genau diese Buchstaben</td></tr>
+  <tr><td>Schlitten</td><td>Halte-Hebel (N/H), Tasten für Tuck/Slip, Maschenweitenregler 0–10</td><td>Jeder Abschnitt nennt die Schlitteneinstellung</td></tr>
+  <tr><td>Reihenzähler</td><td>mechanisch, zählt jede Schlittenfahrt</td><td>Strickmodus zeigt den Soll-Zählerstand, du kannst abgleichen</td></tr>
+  <tr><td>Musterauswahl</td><td><b>kein Lochkartenleser</b>: 8 Tasten zur Nadelvorwahl, dazu Nadeln von Hand nach D holen</td><td>Muster-Assistent in Stufe E <span class="pill warn">Tastenbelegung erfassen</span></td></tr>
+  <tr><td>Doppelbett (Ribber)</td><td><span class="pill ok">Brother KR-586</span> Socken werden rund (als Schlauch) gestrickt. Hebelnamen und Rundstrick-Einstellung werden aus der Bedienungsanleitung übernommen</td><td>1 Runde = 2 Schlittenfahrten = Reihenzähler +2; Grafik zeigt beide Betten</td></tr>
+</table>
+</div>
+
+<h3 style="margin-top:28px">Maschineneinstellungen werden gespeichert, auf drei Ebenen</h3>
+<div class="lvl">
+  <div class="card"><span class="pill tag">1 · je Abschnitt geplant</span>
+    <p>Jeder Abschnitt einer Anleitung trägt die komplette Einstellung:</p>
+    <ul class="sub">
+      <li>Maschenweite Hauptbett / Ribber getrennt</li>
+      <li>Hauptschlitten: Halte-Hebel N/H, Tuck-/Slip-/Teilstricktasten</li>
+      <li>Ribberschloss und Versatzhebel (KR-586)</li>
+      <li>Nadelanordnung beider Betten (z. B. 2:2)</li>
+      <li>Gewichte, Fadenspanner, Garn/Farbe</li>
+    </ul>
+    <p class="sub">Beim Abschnittswechsel erscheint daraus eine <b>Checkliste</b> im Strickmodus.</p>
+  </div>
+  <div class="card"><span class="pill acc tag">2 · je Projekt tatsächlich</span>
+    <p>Änderst du beim Stricken etwas (z. B. MW 5 → 5•, weil es zu fest wird), tippst du es kurz ein. Die App vermerkt es am Abschnitt.</p>
+    <ul class="sub">
+      <li><b>Socke 2</b> wird automatisch mit der korrigierten Einstellung angeleitet</li>
+      <li>Beim <b>Nachstricken</b> in einem Jahr siehst du, womit es gepasst hat</li>
+      <li>Abweichungen stehen auch im PDF</li>
+    </ul>
+  </div>
+  <div class="card"><span class="pill tag">3 · Einstellungs-Vorlagen</span>
+    <p>Wiederkehrende Kombinationen einmal anlegen und benennen:</p>
+    <ul class="sub">
+      <li>„Rundstricken"</li>
+      <li>„Bündchen 2:2"</li>
+      <li>„Verkürzte Reihen, Ribber ruht"</li>
+    </ul>
+    <p class="sub">Die Sockenvorlage verweist darauf, statt alles in jedem Projekt neu einzutragen.</p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="n">2</span> Wie die Daten zusammenhängen</h2>
+<div class="flow">
+  <div class="box">👤 Person<br><span class="sub" style="font-weight:400">Fuß-, Körpermaße</span></div><span class="arr">+</span>
+  <div class="box">🧶 Garn<br><span class="sub" style="font-weight:400">Name, Farbe, Lauflänge</span></div><span class="arr">→</span>
+  <div class="box">📐 Maschenprobe<br><span class="sub" style="font-weight:400">Garn × Maschenweite</span></div><span class="arr">+</span>
+  <div class="box">📋 Vorlage<br><span class="sub" style="font-weight:400">Socke / Pullover</span></div><span class="arr">→</span>
+  <div class="box" style="border-color:var(--pri);color:var(--pri)">🧦 Projekt<br><span class="sub" style="font-weight:400">berechnete Anleitung</span></div><span class="arr">→</span>
+  <div class="box">▶ Strickmodus · 🖨 PDF</div>
+</div>
+<div class="grid3" style="margin-top:14px">
+  <div class="card"><b>Person</b><p class="sub">Name, Schuhgröße, gemessene Maße (Fußlänge, Fußumfang, Ristumfang, Knöchel, Schaftlänge, Wade; für Pullover Brust, Länge, Ärmel …). Fehlt ein Maß, nimmt die App den Wert aus einer Größentabelle und markiert ihn als „geschätzt".</p></div>
+  <div class="card"><b>Maschenprobe</b><p class="sub">Garn + Maschenweite → Maschen und Reihen auf 10 cm (gemessen nach dem Waschen). Mehrere Proben je Garn möglich, z. B. MW 5 und MW 6.</p></div>
+  <div class="card"><b>Projekt</b><p class="sub">Friert die Werte bei der Berechnung ein: spätere Änderungen an Person oder Probe zerstören keine laufende Anleitung. Merkt sich den Fortschritt (Teil, Abschnitt, Reihe).</p></div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="n">3</span> Die Berechnung</h2>
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:0">Grundformeln</h3>
+    <div class="formula">
+      Maschen/cm = Maschenprobe_M / 10<br>
+      Reihen/cm&nbsp; = Maschenprobe_R / 10<br>
+      Maschen&nbsp;&nbsp; = runden( Breite_cm × Maschen/cm )<br>
+      Reihen&nbsp;&nbsp;&nbsp; = runden( Länge_cm × Reihen/cm )<br>
+      Nadeln&nbsp;&nbsp;&nbsp; = Maschen/2 links · Maschen/2 rechts von 0
+    </div>
+    <p class="sub" style="margin-top:10px">Rundungsregeln je Bauteil (z. B. gerade Maschenzahl für Socken, Vielfaches des Bündchenrapports) sind in der Vorlage festgelegt.</p>
+    <h3>Gleichmäßig verteilen</h3>
+    <p>Bei Zu- und Abnahmen rechnet die App den Rhythmus aus und zeigt ihn als Klartext:</p>
+    <div class="formula">Ärmel 54 → 90 Maschen über 120 Reihen<br>= 18 Zunahmen je Seite<br>→ <b>18 × alle 6 Reihen + 12 Reihen gerade</b></div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Beispiel Rundsocke, Größe 39</h3>
+    <table>
+      <tr><th>Eingabe</th><th>Wert</th></tr>
+      <tr><td>Maschenprobe (Sockengarn 4-fach, MW 5)</td><td>30 M · 42 R / 10 cm</td></tr>
+      <tr><td>Fußumfang gemessen</td><td>23,0 cm</td></tr>
+      <tr><td>Negative Weite (Socke soll anliegen)</td><td>− 10 % → 20,7 cm</td></tr>
+      <tr><td>Fußlänge gemessen</td><td>24,5 cm</td></tr>
+    </table>
+    <table style="margin-top:10px">
+      <tr><th>Ergebnis</th><th>Wert</th></tr>
+      <tr><td>Maschen rundherum</td><td><b>64</b> (20,7 × 3,0 = 62,1 → Vielfaches von 4 wegen 2:2-Bündchen)</td></tr>
+      <tr><td>Nadeln</td><td><b>32 je Bett</b>: Hauptbett L16 – R16, Ribber gegenüber</td></tr>
+      <tr><td>Ferse/Spitze (nur Hauptbett)</td><td>32 → 12 → 32 Maschen = <b>40 Reihen</b></td></tr>
+      <tr><td>Fuß rund</td><td>(24,5 − 4,5 Spitze − 4,0 Ferse) × 4,2 = <b>67 Runden</b> = RC +134</td></tr>
+    </table>
+    <p class="sub" style="margin-top:8px">Wie das Rippenbündchen in den Schlauch übergeht, legen wir beim Bau der Sockenvorlage an deiner Maschine fest. Die Zuschläge für Ferse und Spitze sind Startwerte, die nach dem ersten Paar kalibriert werden (siehe Ist-Maße).</p>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h3 style="margin-top:0">Rechenweg Rundsocke, Schritt für Schritt</h3>
+  <p class="sub">Grundlage sind die <b>gemessenen Fußmaße</b> der Person und eine <b>rund gestrickte Maschenprobe</b>. Beispiel: 30 M / 42 R auf 10 cm, also 3,0 M und 4,2 R pro cm.</p>
+  <ol class="steps-list">
+    <li><b>Maschenzahl</b> aus dem Fußumfang am Ballen: 23,0 cm − 10 % negative Weite (je Person einstellbar) = 20,7 cm · 20,7 × 3,0 = 62,1 → gerundet auf den Bündchenrapport (2:2 → Vielfaches von 4) = <b>64 Maschen, 32 je Bett</b>.</li>
+    <li><b>Schaft</b>: Wunschhöhe aus dem Profil minus Bündchen, mal 4,2 → <b>Runden</b>; jede Runde zählt im Reihenzähler 2.</li>
+    <li><b>Ferse</b> in verkürzten Reihen über die halbe Maschenzahl (32, Hauptbett), bis etwa ein Drittel bleibt (12): 2 × (32 − 12) = <b>40 Reihen</b>. Die Mitte strickt alle 40 Reihen mit und klappt um: Fersentiefe ≈ 20 ÷ 4,2 ≈ <b>4,8 cm</b>.</li>
+    <li><b>Spitze</b> nach demselben Prinzip, Tiefe ≈ 4,5–5 cm.</li>
+    <li><b>Fuß</b>: Fußlänge − Fersenanteil − Spitzentiefe, mal 4,2: (24,5 − 4,0 − 4,5) × 4,2 = <b>67 Runden</b>.</li>
+    <li><b>Reihenzählerstände</b> je Abschnitt aufaddieren → Tabelle im PDF und Sollwerte im Strickmodus.</li>
+  </ol>
+  <div class="grid3" style="margin-top:10px">
+    <div class="note"><b>Schuhgröße = nur Schätzung.</b> Sie liefert die Fußlänge recht gut (Größe × ⅔ cm − 1,5 cm; Gr. 39 ≈ 24,5 cm), den Umfang aber nicht: zwei Füße in Gr. 39 können 21 oder 25 cm messen. Fehlende Maße werden geschätzt und gestrichelt angezeigt.</div>
+    <div class="note"><b>Probe flach oder rund.</b> Ein Schlauch auf dem Doppelbett ergibt oft eine andere Probe als ein flaches Stück bei gleicher Maschenweite. Jede Probe wird als „flach" oder „rund" gespeichert; Socken nehmen bevorzugt die runde. Gemessen wird die flach liegende Schlauchbreite, die App verdoppelt.</div>
+    <div class="note"><b>Wadenabnahme (optional)</b> für lange Socken: Wade 34 cm − 10 % × 3,0 = 92 M oben, 64 M am Knöchel → 28 M weniger = 7 Abnahmerunden à 4 M (je Bett an beiden Rändern), z. B. <b>alle 8 Runden</b>.</div>
+  </div>
+  <p class="sub" style="margin-top:8px">Ferse- und Spitzenwerte sind Startwerte. Nach dem ersten Paar trägst du die Ist-Maße ein, und die App korrigiert ihre Annahmen für dieses Garn.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="n">4</span> Die wichtigsten Ansichten</h2>
+<p class="sub">Entwürfe, keine fertigen Bildschirme. Farben, Texte und Aufteilung bestimmen wir gemeinsam.</p>
+
+<div class="mocks">
+
+  <!-- 1 Start -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="appbar"><div class="t">Maschenwerk</div></div>
+      <div class="body">
+        <div class="sect">Auf der Nadel</div>
+        <div class="tile">
+          <div class="row"><div class="h">Socken für Lena</div><span class="chip acc">Socke 2/2</span></div>
+          <div class="s">Gr. 39 · Opal Uni Petrol · MW 5 · rund</div>
+          <div class="bar"><span style="width:62%"></span></div>
+          <div class="row" style="margin-top:6px"><div class="s">Ferse · Reihe 13/40</div><div class="chip">▶ Weiterstricken</div></div>
+        </div>
+        <div class="tile">
+          <div class="row"><div class="h">Pullover Papa</div><span class="chip">Rückenteil</span></div>
+          <div class="s">Gr. 52 · Merino DK · MW 7</div>
+          <div class="bar"><span style="width:18%"></span></div>
+        </div>
+        <div class="sect">Schnell starten</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="tile" style="text-align:center"><div style="font-size:22px">🧦</div><div class="h">Neue Socken</div></div>
+          <div class="tile" style="text-align:center"><div style="font-size:22px">👕</div><div class="h">Neuer Pullover</div></div>
+          <div class="tile" style="text-align:center"><div style="font-size:22px">📐</div><div class="h">Maschenprobe</div></div>
+          <div class="tile" style="text-align:center"><div style="font-size:22px">🧮</div><div class="h">Schnellrechner</div></div>
+        </div>
+        <div class="sect">Zuletzt fertig</div>
+        <div class="tile"><div class="row"><div class="h">Socken Oma Inge</div><span class="chip" style="background:var(--ok-soft);color:var(--ok)">✓ 28.10.</span></div></div>
+      </div>
+      <div class="tabbar"><div class="on"><i>⌂</i>Start</div><div><i>🧶</i>Projekte</div><div><i>👤</i>Personen</div><div><i>📐</i>Proben</div><div><i>⋯</i>Mehr</div></div>
+    </div></div>
+    <div class="cap"><b>Start</b> · laufende Projekte mit Fortschritt, ein Tipp auf „Weiterstricken" springt genau dorthin, wo du aufgehört hast.</div>
+  </div>
+
+  <!-- 2 Person -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="appbar"><span class="back">‹</span><div class="t">Lena</div></div>
+      <div class="body">
+        <div class="tile row" style="justify-content:flex-start;gap:10px">
+          <div class="avatar" style="background:var(--acc)">L</div>
+          <div><div class="h">Lena</div><div class="s">Schuhgröße 39 · mag Socken eher locker</div></div>
+        </div>
+        <div class="seg"><div class="on">Füße</div><div>Körper</div><div>Projekte</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 8px">
+          <div class="fld"><div class="l">Fußlänge</div><div class="v">24,5 cm</div></div>
+          <div class="fld"><div class="l">Fußumfang (Ballen)</div><div class="v">23,0 cm</div></div>
+          <div class="fld"><div class="l">Ristumfang</div><div class="v">24,0 cm</div></div>
+          <div class="fld"><div class="l">Fersenumfang (diag.)</div><div class="v">31,5 cm</div></div>
+          <div class="fld"><div class="l">Knöchel</div><div class="v">22,0 cm</div></div>
+          <div class="fld" style="border-style:dashed"><div class="l">Wade · geschätzt</div><div class="v" style="color:var(--muted)">34 cm</div></div>
+          <div class="fld"><div class="l">Schaftlänge</div><div class="v">16 cm</div></div>
+          <div class="fld"><div class="l">Weite</div><div class="v">− 8 %</div></div>
+        </div>
+        <div class="tile" style="background:var(--pri-soft);border-color:#cfe0e3">
+          <div class="h" style="color:var(--pri)">📏 Füße messen</div>
+          <div class="s">Messmaske mit Fußzeichnung öffnen · Messblatt als PDF drucken</div>
+        </div>
+        <div class="btn">🧦 Socken für Lena anlegen</div>
+      </div>
+      <div class="tabbar"><div><i>⌂</i>Start</div><div><i>🧶</i>Projekte</div><div class="on"><i>👤</i>Personen</div><div><i>📐</i>Proben</div><div><i>⋯</i>Mehr</div></div>
+    </div></div>
+    <div class="cap"><b>Person</b> · gemessene Maße, fehlende werden aus der Größentabelle geschätzt (gestrichelt). Persönliche Vorliebe zur Weite wird gespeichert.</div>
+  </div>
+
+  <!-- 3 Maschenprobe -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="appbar"><span class="back">‹</span><div class="t">Neue Maschenprobe</div></div>
+      <div class="body">
+        <div class="fld"><div class="l">Garn</div><div class="v">Opal Uni 4-fach · Petrol ▾</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 8px">
+          <div class="fld"><div class="l">Maschenweite</div><div class="v">5 ••</div></div>
+          <div class="fld"><div class="l">Probe gestrickt</div><div class="v">40 M × 60 R</div></div>
+        </div>
+        <div class="sect">Gemessen (nach dem Waschen)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 8px">
+          <div class="fld"><div class="l">Breite der 40 M</div><div class="v">13,3 cm</div></div>
+          <div class="fld"><div class="l">Höhe der 60 R</div><div class="v">14,3 cm</div></div>
+        </div>
+        <div class="res">
+          <div class="s">Ergibt auf 10 × 10 cm</div>
+          <div class="row"><div class="big">30 M</div><div class="big">42 R</div></div>
+          <div class="s">3,0 Maschen/cm · 4,2 Reihen/cm</div>
+        </div>
+        <div class="tile">
+          <div class="h">💡 Tipp der App</div>
+          <div class="s">Probe mindestens 40 Maschen breit stricken und nur die Mitte messen. Markierfaden bei Nadel L20 und R20 einlegen.</div>
+        </div>
+        <div class="btn">Probe speichern</div>
+      </div>
+      <div class="tabbar"><div><i>⌂</i>Start</div><div><i>🧶</i>Projekte</div><div><i>👤</i>Personen</div><div class="on"><i>📐</i>Proben</div><div><i>⋯</i>Mehr</div></div>
+    </div></div>
+    <div class="cap"><b>Maschenprobe</b> · du misst die gestrickte Probe, die App rechnet auf 10 cm um. Je Garn mehrere Proben bei unterschiedlicher Maschenweite.</div>
+  </div>
+
+  <!-- 4 Strickmodus -->
+  <div class="mock">
+    <div class="phone"><div class="screen knit">
+      <div class="sbar"><span>9:41</span><span>📡 Sensor · ☀ an</span></div>
+      <div class="appbar"><span class="back">✕</span><div class="t">Socken Lena · Socke 2/2</div></div>
+      <div class="kprog"><span class="d"></span><span class="d"></span><span class="d"></span><span class="c"></span><span></span><span></span><span></span></div>
+      <div class="kphase">Ferse · verkürzte Reihen · Abnahme</div>
+      <div class="krow"><div class="big">13</div><div class="of">von 40 Reihen</div></div>
+      <div class="krc"><div><div class="l">Reihenzähler vor der Reihe</div><div class="v">RC 176</div></div><div style="text-align:right"><div class="l">Schlitten</div><div style="font-weight:700">steht links ◀</div></div></div>
+      <div class="kinst">Nur Hauptbett, Ribber ruht. Halte-Hebel auf <b>H</b>. Die äußerste Fersennadel auf der Schlittenseite (<b>L10</b>) nach <b>E</b> schieben, Faden unter die Nadel legen und <b>1 Reihe</b> nach rechts stricken.</div>
+      <div class="bed">
+        <div class="needles" id="needles"></div>
+        <div class="bedlab"><span>L16</span><span>Hauptbett</span><span>R16</span></div>
+        <div class="needles rib" id="ribber"></div>
+        <div class="bedlab"><span></span><span>Ribber · ruht</span><span></span></div>
+        <div class="legend"><span><i style="background:#5fb3bf"></i>B Arbeit</span><span><i style="background:#f0a48f"></i>E Halten</span><span><i style="background:#fff"></i>jetzt</span><span><i style="background:#2c4a51"></i>ruht</span></div>
+      </div>
+      <div class="kbtns"><div class="bk">‹</div><div class="go">Reihe gestrickt ✓</div></div>
+    </div></div>
+    <div class="cap"><b>Strickmodus</b> · das Herzstück. Dunkel, große Schrift, Bildschirm bleibt an. Bei Aktionen (Ferse, Nadeln umstellen) jede Reihe einzeln, gerade Strecken als Block („bis RC 164 rund stricken"). Ein Sensor kann die Runden später automatisch zählen; vor jeder Aktion hält die App an und piept.</div>
+  </div>
+
+  <!-- Messmaske -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="appbar"><span class="back">‹</span><div class="t">Lenas Füße messen</div><span class="chip" style="margin-left:auto">2 / 7</span></div>
+      <div class="body">
+        <div class="footsvg"><svg viewBox="0 0 260 205" width="100%" height="150" fill="none" stroke-linecap="round">
+            <path d="M50 10 L50 120 Q40 150 42 168 Q46 182 62 182 L220 182 Q240 182 240 170 Q240 158 222 154 L150 132 Q115 120 98 100 L95 10 Z" fill="#f3efe9" stroke="#8a8f96" stroke-width="2"/>
+            <ellipse cx="72" cy="25" rx="23" ry="6" stroke="#9aa3ab" stroke-dasharray="3 3"/>
+            <ellipse cx="73" cy="85" rx="23" ry="6" stroke="#9aa3ab" stroke-dasharray="3 3"/>
+            <ellipse cx="82" cy="143" rx="47" ry="7" transform="rotate(-43 82 143)" stroke="#9aa3ab" stroke-dasharray="3 3"/>
+            <ellipse cx="130" cy="153" rx="7" ry="29" stroke="#9aa3ab" stroke-dasharray="3 3"/>
+            <ellipse cx="185" cy="162" rx="8" ry="20" stroke="#c2553a" stroke-width="3.5"/>
+            <line x1="28" y1="182" x2="28" y2="25" stroke="#9aa3ab" stroke-dasharray="3 3"/>
+            <line x1="42" y1="196" x2="240" y2="196" stroke="#9aa3ab" stroke-dasharray="3 3"/>
+            <text x="200" y="138" font-size="12" fill="#c2553a" font-weight="700" stroke="none">Ballen</text>
+            <text x="104" y="32" font-size="10" fill="#8a8f96" stroke="none">Wade</text>
+            <text x="104" y="90" font-size="10" fill="#8a8f96" stroke="none">Knöchel</text>
+            <text x="118" y="200" font-size="10" fill="#8a8f96" stroke="none">Fußlänge</text>
+          </svg></div>
+        <div class="fld">
+          <div class="l">Fußlänge</div><div class="v">24,5 cm ✓</div>
+        </div>
+        <div class="fld on">
+          <div class="l" style="color:var(--acc);font-weight:700">Fußumfang am Ballen</div><div class="v">23,0 cm</div>
+          <div class="hint">Breiteste Stelle über den Ballen. Maßband anliegend, aber nicht ziehen. Am besten im Stehen.</div>
+        </div>
+        <div class="mini">
+          <div class="fld"><div class="l">Rist</div><div class="v" style="color:var(--muted)">–</div></div>
+          <div class="fld"><div class="l">Ferse diagonal</div><div class="v" style="color:var(--muted)">–</div></div>
+          <div class="fld"><div class="l">Knöchel</div><div class="v" style="color:var(--muted)">–</div></div>
+          <div class="fld"><div class="l">Schafthöhe</div><div class="v" style="color:var(--muted)">–</div></div>
+        </div>
+        <div class="btn">Weiter: Rist ›</div>
+      </div>
+    </div></div>
+    <div class="cap"><b>Messmaske</b> · die Zeichnung bleibt oben stehen; zum aktiven Feld leuchtet die Messlinie auf, darunter steht, wie gemessen wird. Tippen auf eine Linie springt ins Feld. Unplausible Werte (z. B. 31 cm Umfang bei Gr. 36) fragt die App nach. Dieselbe Zeichnung gibt es als <b>Messblatt-PDF</b> zum Mitgeben.</div>
+  </div>
+
+  <!-- Checkliste Abschnittswechsel -->
+  <div class="mock">
+    <div class="phone"><div class="screen knit">
+      <div class="sbar"><span>9:41</span><span>📡 Sensor · ☀ an</span></div>
+      <div class="appbar"><span class="back">✕</span><div class="t">Socken Lena · Socke 2/2</div></div>
+      <div class="kprog"><span class="d"></span><span class="d"></span><span class="d"></span><span class="c"></span><span></span><span></span><span></span></div>
+      <div class="kphase">Abschnitt 4 · Ferse</div>
+      <div style="padding:2px 16px 0;font-size:22px;font-weight:800">Vor dem Start einstellen</div>
+      <div class="chk">
+        <div class="ok"><i>✓</i><span>Reihenzähler steht auf <b>164</b></span></div>
+        <div class="ok"><i>✓</i><span>Ribber außer Arbeit <small>Bezeichnung des Hebels aus der KR-586-Anleitung</small></span></div>
+        <div class="chg"><i></i><span>Maschenweite Hauptbett <b>5•</b> <small>bei Socke 1 von 5 auf 5• geändert</small></span></div>
+        <div><i></i><span>Halte-Hebel auf <b>H</b>, Nadeln L16–L11 und R11–R16 folgen nacheinander nach E</span></div>
+        <div><i></i><span>2 kleine Gewichte unter die Fersenmitte</span></div>
+      </div>
+      <div class="kbtns"><div class="bk">✎</div><div class="go">Alles eingestellt ▶</div></div>
+    </div></div>
+    <div class="cap"><b>Checkliste beim Abschnittswechsel</b> · aus den gespeicherten Maschineneinstellungen. Was bei Socke 1 geändert wurde, ist markiert und gilt jetzt automatisch. Mit ✎ notierst du eine neue Änderung.</div>
+  </div>
+
+  <!-- 5 Abschnittsübersicht -->
+  <div class="mock">
+    <div class="phone"><div class="screen">
+      <div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="appbar"><span class="back">‹</span><div class="t">Socken für Lena</div></div>
+      <div class="body">
+        <div class="seg"><div class="on">Ablauf</div><div>Werte</div><div>Notizen</div></div>
+        <div class="tile row"><div><div class="h">1 · Anschlag + Bündchen</div><div class="s">Doppelbett 2:2 · 30 R · MW 4</div></div><span class="chip" style="background:var(--ok-soft);color:var(--ok)">✓</span></div>
+        <div class="tile row"><div><div class="h">2 · Schaft</div><div class="s">67 Runden rund · MW 5 · RC 030 → 164</div></div><span class="chip" style="background:var(--ok-soft);color:var(--ok)">✓</span></div>
+        <div class="tile row" style="border-color:var(--acc)"><div><div class="h">3 · Ferse</div><div class="s">Hauptbett, verkürzte Reihen 32 → 12 → 32</div></div><span class="chip acc">13/40</span></div>
+        <div class="tile row"><div><div class="h">4 · Fuß</div><div class="s">67 Runden rund · RC 204 → 338</div></div><span class="chip" style="background:#eee;color:#888">offen</span></div>
+        <div class="tile row"><div><div class="h">5 · Spitze</div><div class="s">wie Ferse · RC 338 → 378</div></div><span class="chip" style="background:#eee;color:#888">offen</span></div>
+        <div class="tile row"><div><div class="h">6 · Hilfsgarn + Maschenstich</div><div class="s">Spitze unsichtbar schließen</div></div><span class="chip" style="background:#eee;color:#888">offen</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+          <div class="btn ghost">🖨 PDF</div><div class="btn">▶ Stricken</div>
+        </div>
+      </div>
+      <div class="tabbar"><div><i>⌂</i>Start</div><div class="on"><i>🧶</i>Projekte</div><div><i>👤</i>Personen</div><div><i>📐</i>Proben</div><div><i>⋯</i>Mehr</div></div>
+    </div></div>
+    <div class="cap"><b>Projekt</b> · alle Abschnitte auf einen Blick, Reihenzähler-Bereiche je Abschnitt, Sprung in den Strickmodus oder zum PDF.</div>
+  </div>
+
+</div>
+
+<!-- Desktop wizard -->
+<div class="mock" style="margin-top:34px">
+  <div class="desk">
+    <div class="top"><i></i><i></i><i></i><span>https://maschenwerk.local/projekte/neu/socke</span></div>
+    <div class="dgrid">
+      <div class="dnav">
+        <div style="font-weight:800;color:var(--ink);margin-bottom:8px">🧶 Maschenwerk</div>
+        <div>⌂ Start</div><div class="on">🧶 Projekte</div><div>👤 Personen</div><div>📐 Maschenproben</div><div>🧵 Garne</div><div>▦ Muster</div><div>⚙ Einstellungen</div>
+      </div>
+      <div class="dpane">
+        <div class="steps"><span class="done">1 Person</span><span class="done">2 Probe</span><span class="on">3 Form</span><span>4 Prüfen</span></div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:8px">Neue Socken · Form wählen</div>
+        <div class="fld"><div class="l">Bündchen</div><div class="v">Doppelbett 2:2 · 30 Reihen ▾</div></div>
+        <div class="fld"><div class="l">Ferse</div><div class="v">Bumerang, nur Hauptbett ▾</div></div>
+        <div class="fld"><div class="l">Spitze · Schluss</div><div class="v">Bumerang · Maschenstich ▾</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 8px">
+          <div class="fld"><div class="l">Schaftlänge</div><div class="v">16 cm</div></div>
+          <div class="fld"><div class="l">Weite</div><div class="v">− 8 % (aus Profil)</div></div>
+        </div>
+        <div class="fld"><div class="l">Muster im Schaft</div><div class="v">keins · Nadelauswahl (Stufe E) …</div></div>
+      </div>
+      <div class="dpane">
+        <div style="font-weight:700;margin-bottom:4px">Live-Ergebnis</div>
+        <svg class="sock" width="200" height="150" viewBox="0 0 200 150" fill="none">
+          <path d="M60 8 h50 v70 q0 18 18 22 l42 6 q22 4 22 24 q0 14 -22 14 h-86 q-30 0 -30 -28 v-38 z" fill="#e3eff1" stroke="#23606e" stroke-width="2"/>
+          <line x1="60" y1="28" x2="110" y2="28" stroke="#23606e" stroke-dasharray="3 3"/>
+          <text x="114" y="22" font-size="9" fill="#5f6670">Bündchen 30 R</text>
+          <text x="114" y="56" font-size="9" fill="#5f6670">Schaft 67 Rd</text>
+          <text x="32" y="122" font-size="9" fill="#c2553a">Ferse 40 R</text>
+          <text x="110" y="138" font-size="9" fill="#5f6670">Fuß 67 Rd</text>
+          <text x="164" y="118" font-size="9" fill="#c2553a">Spitze</text>
+        </svg>
+        <table>
+          <tr><td>Maschen</td><td><b>64 · 32 je Bett</b></td></tr>
+          <tr><td>Reihenzähler</td><td><b>RC 378</b> je Socke</td></tr>
+          <tr><td>Garnbedarf</td><td>≈ 48 g je Socke</td></tr>
+          <tr><td>Strickzeit</td><td>≈ 1 h 10 min</td></tr>
+        </table>
+        <div class="btn" style="margin-top:10px">Weiter zu Prüfen ›</div>
+      </div>
+    </div>
+  </div>
+  <div class="cap" style="max-width:600px"><b>Projekt-Assistent (am PC)</b> · Schritt für Schritt, rechts siehst du sofort, was herauskommt. Am Handy liegen die Spalten untereinander.</div>
+</div>
+
+<!-- PDF + Lochkarte -->
+<div class="mocks" style="margin-top:34px;align-items:flex-start">
+  <div class="mock">
+    <div class="pdf">
+      <div class="row"><h4>Socken für Lena · Gr. 39</h4><span class="mono" style="color:var(--muted)">Seite 1/2</span></div>
+      <div class="meta">Brother KH-588 · Opal Uni 4-fach Petrol · Maschenprobe 30 M / 42 R auf 10 cm bei MW 5 · 64 Maschen rund, je Bett L16–R16 · 2 Socken</div>
+      <svg width="100%" height="80" viewBox="0 0 380 80" fill="none">
+        <path d="M30 4 h40 v34 q0 10 10 12 l70 4 q14 2 14 14 q0 10 -14 10 h-100 q-20 0 -20 -18 v-24 z" fill="#e3eff1" stroke="#23606e"/>
+        <text x="180" y="20" font-size="8" fill="#333">Fußlänge 24,5 cm · Fußumfang 23,0 cm</text>
+        <text x="180" y="34" font-size="8" fill="#333">Schaftlänge 16 cm · Weite − 8 %</text>
+        <text x="180" y="48" font-size="8" fill="#333">Garnbedarf ≈ 96 g (2 Knäuel à 50 g)</text>
+      </svg>
+      <table>
+        <tr><th></th><th>Abschnitt</th><th>Umfang</th><th>RC</th><th>Anweisung</th></tr>
+        <tr><td><span class="box"></span></td><td>1 Anschlag</td><td>–</td><td>000</td><td>Hauptbett + Ribber L16–R16, 2:2-Anordnung, Anschlag mit Hilfsgarn</td></tr>
+        <tr><td><span class="box"></span></td><td>2 Bündchen</td><td>30 R</td><td>000–030</td><td>Rippe 2:2, MW 3/3, danach Maschen für den Schlauch umhängen</td></tr>
+        <tr><td><span class="box"></span></td><td>3 Schaft</td><td>67 Rd</td><td>030–164</td><td>rund, MW 5, 1 Runde = 2 Fahrten</td></tr>
+        <tr><td><span class="box"></span></td><td>4 Ferse ab</td><td>20 R</td><td>164–184</td><td>nur Hauptbett, H-Hebel. Je Reihe Nadel auf Schlittenseite nach E, bis 12 M in B</td></tr>
+        <tr><td><span class="box"></span></td><td>5 Ferse zu</td><td>20 R</td><td>184–204</td><td>je Reihe 1 Nadel von E zurück nach B</td></tr>
+        <tr><td><span class="box"></span></td><td>6 Fuß</td><td>67 Rd</td><td>204–338</td><td>beide Betten, N-Hebel, rund</td></tr>
+        <tr><td><span class="box"></span></td><td>7 Spitze</td><td>40 R</td><td>338–378</td><td>wie Ferse</td></tr>
+        <tr><td><span class="box"></span></td><td>8 Schluss</td><td>–</td><td>–</td><td>Hilfsgarn, abnehmen, Spitze im Maschenstich schließen</td></tr>
+      </table>
+      <div style="margin-top:8px;color:var(--muted)">Notizen: _______________________________________________</div>
+    </div>
+    <div class="cap"><b>PDF-Anleitung (A4)</b> · Kopf mit allen Werten, Skizze mit Maßen, Tabelle mit Reihenzähler-Bereichen und Abhakkästchen.</div>
+  </div>
+
+  <div class="mock">
+    <div class="phone" style="height:520px"><div class="screen">
+      <div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="appbar"><span class="back">‹</span><div class="t">Muster „Tuck-Rippe"</div></div>
+      <div class="body">
+        <div class="seg"><div class="on">Raster</div><div>Vorschau</div><div>Ablauf</div></div>
+        <div class="pc" id="pc"></div>
+        <div class="s" style="font-size:11px;color:var(--muted);margin:6px 2px">Rapport 4 Maschen × 4 Reihen · über das Bett wiederholt</div>
+        <div class="tile"><div class="h">Reihe 1–2</div><div class="s">Vorwahltaste <b>?</b> (Belegung wird erfasst) oder von Hand: jede 4. Nadel ab L16 nach D</div></div>
+        <div class="tile"><div class="h">Reihe 3–4</div><div class="s">jede 4. Nadel ab L14 nach D</div></div>
+      </div>
+    </div></div>
+    <div class="cap"><b>Muster-Assistent (Stufe E)</b> · Muster im Raster zeichnen; die App übersetzt es je Reihe in eine der 8 Vorwahltasten oder in eine Handauswahl.</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="n">5</span> Funktionsumfang (Vorschlag)</h2>
+<div class="card">
+<table>
+  <tr><th style="width:24%">Bereich</th><th>Inhalt</th><th style="width:14%">Vorschlag</th></tr>
+  <tr><td>Personen</td><td>Messmaske mit Fußzeichnung und Hinweis je Maß, Plausibilitätsprüfung, Messblatt als PDF; Maße mit Messanleitung, Größentabellen (Schuhgröße → Fußmaße, Konfektion → Körpermaße), Vorliebe für die Weite</td><td><span class="pill">Kern</span></td></tr>
+  <tr><td>Maschenproben</td><td>Umrechnung auf 10 cm, je Garn mehrere Maschenweiten, <b>flach oder rund</b>, gewaschen/ungewaschen</td><td><span class="pill">Kern</span></td></tr>
+  <tr><td>Sockenvorlage</td><td>rund auf dem Doppelbett; Bündchen 1:1, 2:1/2:2 oder Mock-Rib; mehrere Fersen-/Spitzenformen zur Wahl; Schluss im Maschenstich; optionale Wadenabnahme; Kinder- bis Herrengrößen</td><td><span class="pill">Kern</span></td></tr>
+  <tr><td>Strickmodus</td><td>gemischt: Aktionen reihenweise, gerade Strecken als Block; Reihenzähler-Soll, Grafik beider Betten, Fortschritt gespeichert, Bildschirm bleibt an; Zählschnittstelle (Webhook) gleich vorgesehen</td><td><span class="pill">Kern</span></td></tr>
+  <tr><td>Rundenzähler-Sensor</td><td>Zigbee-Kontakt über Home Assistant oder ESP32/ESPHome am Bettende; App hält vor Aktionen an und piept</td><td><span class="pill">Stufe 2</span></td></tr>
+  <tr><td>PDF-Anleitung</td><td>A4, Skizze, Tabelle mit Reihenzähler-Bereichen, Abhakkästchen</td><td><span class="pill">Kern</span></td></tr>
+  <tr><td>Maschineneinstellungen</td><td>je Abschnitt geplant (Checkliste im Strickmodus), Änderungen je Projekt vermerkt und für Socke 2 übernommen, benannte Einstellungs-Vorlagen</td><td><span class="pill">Kern</span></td></tr>
+  <tr><td>Pullovervorlage</td><td>eingesetzte Ärmel, Raglan, überschnittene Schulter; Rücken, Vorderteil, Ärmel, Halsausschnitt; Zu-/Abnahmen gleichmäßig verteilt</td><td><span class="pill">Stufe 2</span></td></tr>
+  <tr><td>Ist-Maße &amp; Kalibrierung</td><td>nach dem Stricken nachmessen → Korrekturfaktor je Garn/Vorlage</td><td><span class="pill">Stufe 2</span></td></tr>
+  <tr><td>Garne</td><td>Garne mit Lauflänge, Gramm, Farbe, Foto; Garnbedarf und Knäuelzahl je Projekt (kein Vorrat)</td><td><span class="pill">Stufe 2</span></td></tr>
+  <tr><td>Muster-Assistent</td><td>Muster im Raster, Übersetzung in die 8 Vorwahltasten oder Handauswahl, im Projekt einbinden</td><td><span class="pill">Stufe E</span></td></tr>
+  <tr><td>Eigene Vorlagen</td><td>eigene Bauteile (Mütze, Schal, Babysocke) aus Abschnitten zusammensetzen</td><td><span class="pill acc">optional</span></td></tr>
+  <tr><td>Sprachausgabe</td><td>Anweisung wird vorgelesen</td><td><span class="pill acc">optional</span></td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="n">6</span> Technik und Betrieb</h2>
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:0">Aufbau (wie ImkereiApp)</h3>
+    <ul>
+      <li><b>LXC</b> Debian 12, klein: 1 CPU, 512 MB RAM, 4 GB Platte</li>
+      <li><b>Backend</b> Node.js + Express, Daten in <b>SQLite</b> (eine Datei, einfach zu sichern)</li>
+      <li><b>Oberfläche</b> eigene Web-App ohne Framework, als <b>App auf dem Homebildschirm</b> installierbar (iPhone und Android)</li>
+      <li><b>nginx mit HTTPS</b> (selbstsigniertes Zertifikat): nötig, damit der Bildschirm im Strickmodus anbleibt</li>
+      <li><b>PDF</b> wird im Browser erzeugt (jsPDF, aus der ImkereiApp bewährt)</li>
+      <li><b>Offline-fähig im Strickmodus:</b> fällt das WLAN kurz aus, strickst du weiter; der Fortschritt wird nachgereicht</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Installation &amp; Update auf 192.168.5.40</h3>
+    <ul>
+      <li>Eigenes Git-Repo (GitHub), Installation mit <b>einem Befehl in der Proxmox-Shell</b> <span class="pill ok">entschieden</span>: legt den Container an, richtet alles ein und prüft am Ende selbst, ob es läuft</li>
+      <li><b>Update</b> per Befehl <span class="mono">update</span> im Container, zusätzlich als Knopf unter „Einstellungen" (wie bei TrackingDRS)</li>
+      <li><b>Nächtliche Sicherung</b> der Datenbank, mehrere Generationen; Export/Import als Datei</li>
+      <li><b>Kein Login</b>: nur du, nur im Heimnetz <span class="pill ok">entschieden</span></li>
+      <li><b>Zählschnittstelle</b>: <span class="mono">POST /api/zaehler</span> für Home Assistant oder ESP32</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="n">7</span> Stufenplan</h2>
+<div class="grid3">
+  <div class="card"><span class="pill">Stufe A</span><h3>Fundament</h3><p class="sub">Container, Installer, Update, Design, Personen, Garne, Maschenproben, Schnellrechner</p></div>
+  <div class="card"><span class="pill">Stufe B</span><h3>Socken</h3><p class="sub">Rundsocke auf dem Doppelbett, Projekt-Assistent, Strickmodus mit Zählschnittstelle, PDF. <b>Danach bist du arbeitsfähig.</b></p></div>
+  <div class="card"><span class="pill">Stufe C</span><h3>Pullover</h3><p class="sub">Pullovervorlage mit Schnittteilen, verteilte Zu- und Abnahmen, Schnittskizze im PDF</p></div>
+  <div class="card"><span class="pill">Stufe D</span><h3>Feinschliff</h3><p class="sub">Rundenzähler-Sensor, Ist-Maße und Kalibrierung, Garnbedarf, Statistik „was habe ich für wen gestrickt"</p></div>
+  <div class="card"><span class="pill acc">Stufe E</span><h3>Muster</h3><p class="sub">Muster-Assistent für die 8 Vorwahltasten und Handauswahl, Farbwechsel im Strickmodus</p></div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="n">8</span> Entscheidungen aus dem Dialog (02.11.2026)</h2>
+<div class="card">
+<table>
+  <tr><th style="width:26%">Thema</th><th>Entscheidung</th></tr>
+  <tr><td>Doppelbett</td><td><b>Brother KR-586</b>; Socken werden <b>rund</b> gestrickt</td></tr>
+  <tr><td>Bündchen</td><td>1:1 Doppelbett, 2:1/2:2 Doppelbett, Mock-Rib einbettig</td></tr>
+  <tr><td>Ferse / Spitze</td><td>mehrere Formen je Projekt wählbar; Spitze im <b>Maschenstich</b> schließen</td></tr>
+  <tr><td>Strickmodus</td><td>gemischt: Aktionen reihenweise, gerade Strecken als Block</td></tr>
+  <tr><td>Weiterzählen</td><td>Knopf zuerst, Zählschnittstelle gleich mit; Sensor (Zigbee/HA oder ESP32) folgt</td></tr>
+  <tr><td>Pullover</td><td>eingesetzte Ärmel, Raglan, überschnittene Schulter</td></tr>
+  <tr><td>Muster</td><td>kein Lochkartenleser; Muster-Assistent für 8 Vorwahltasten + Handauswahl in Stufe E</td></tr>
+  <tr><td>Garne</td><td>Garne + Garnbedarf, kein Vorrat</td></tr>
+  <tr><td>Zugriff</td><td>nur du, nur Heimnetz, kein Login</td></tr>
+  <tr><td>Installation</td><td>Einzeiler in der Proxmox-Shell auf 192.168.5.40, Update per <span class="mono">update</span> und Knopf</td></tr>
+  <tr><td>Maschineneinstellungen</td><td>drei Ebenen: je Abschnitt geplant, je Projekt tatsächlich, Einstellungs-Vorlagen</td></tr>
+  <tr><td>Maße</td><td>Messmaske mit Fußzeichnung; Schuhgröße nur als Schätzung; Probe flach/rund; Wadenabnahme optional</td></tr>
+  <tr><td>Design / Name</td><td>Petrol + Wollrot, dunkler Strickmodus · <b>Maschenwerk</b></td></tr>
+</table>
+</div>
+<h3>Noch offen</h3>
+<ul>
+  <li>Belegung der <b>8 Vorwahltasten</b> (Foto der Tasten oder der Anleitungsseite), spätestens zu Stufe E</li>
+  <li>Aus den Anleitungen von KH-588 und <b>KR-586</b> (Fotos/PDF-Seiten): Hebel am Ribberschloss, Einstellung zum Rundstricken, Versatz-Skala, Maschenweitenbereich, zu Stufe B</li>
+  <li>Wie das Rippenbündchen in den Schlauch übergeht (beim Bau der Sockenvorlage)</li>
+  <li>Container-Nummer und feste IP im Netz von 192.168.5.40</li>
+  <li>GitHub-Repo anlegen (Name, öffentlich oder privat)</li>
+</ul>
+
+<footer>Maschenwerk · Konzept, abgestimmt am 02.11.2026 · lokal gespeichert unter Dokumente\ClaudeCode\Maschenwerk</footer>
+</div>
+
+<script>
+  // Lochkarten-Mockup: kleines Sternmuster in 24 × 20
+  const rows = [];
+  for (let y = 0; y < 16; y++) rows.push(Array.from({length: 24}, (_, x) => (x + (y >> 1) * 2) % 4 === 0 ? '1' : '0').join(''));
+  // Nadelbett-Mockup: Ferse auf dem Hauptbett L16–R16, 12 Reihen verkürzt, L10 ist dran; Ribber ruht
+  const nb = document.getElementById('needles');
+  for (let i = 0; i < 32; i++) {
+    const s = document.createElement('span');
+    if (i < 6 || i >= 26) s.className = 'e';
+    else if (i === 6) s.className = 'z';
+    nb.appendChild(s);
+  }
+  const rb = document.getElementById('ribber');
+  for (let i = 0; i < 32; i++) rb.appendChild(document.createElement('span'));
+  const pc = document.getElementById('pc');
+  rows.forEach(r => [...r].forEach(c => { const s = document.createElement('span'); if (c === '1') s.className = 'x'; pc.appendChild(s); }));
+</script>
+</body>
+</html>

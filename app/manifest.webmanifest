@@ -1,0 +1,16 @@
+{
+  "name": "Maschenwerk",
+  "short_name": "Maschenwerk",
+  "description": "Strickanleitungen für die Brother KH-588 berechnen und Reihe für Reihe stricken",
+  "lang": "de",
+  "start_url": "./#/",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f4f1",
+  "theme_color": "#23606e",
+  "icons": [
+    { "src": "assets/logo.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

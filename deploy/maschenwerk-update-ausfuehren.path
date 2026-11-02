@@ -1,0 +1,10 @@
+# Knopf „Jetzt aktualisieren" in der App: der Webdienst legt /var/lib/maschenwerk/update/ausfuehren an.
+[Unit]
+Description=Maschenwerk: Update auf Knopfdruck
+
+[Path]
+PathExists=/var/lib/maschenwerk/update/ausfuehren
+Unit=maschenwerk-update-ausfuehren.service
+
+[Install]
+WantedBy=multi-user.target

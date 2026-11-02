@@ -1,0 +1,10 @@
+# Nach einer neuen Maschenwerk-Version suchen (täglich per Timer und auf Knopfdruck).
+[Unit]
+Description=Maschenwerk: nach neuer Version suchen
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/maschenwerk-selbstupdate pruefen
+TimeoutStartSec=5min

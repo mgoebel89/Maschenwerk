@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#23606e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Maschenwerk">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Maschenwerk</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon-180.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="marke" href="#/">
+        <img src="assets/logo.svg" alt="">
+        <span>Maschenwerk</span>
+      </a>
+      <nav id="navSeite" class="nav-seite"></nav>
+      <div class="sidebar-fuss" id="versionSeite"></div>
+    </aside>
+    <div class="inhalt">
+      <header class="kopf-mobil">
+        <img src="assets/logo.svg" alt="">
+        <span class="kopf-titel" id="kopfTitel">Maschenwerk</span>
+        <a class="icon-btn" href="#/einstellungen" aria-label="Einstellungen" id="kopfEinstellungen"></a>
+      </header>
+      <main id="app" class="seite"><div class="laden">Lade …</div></main>
+    </div>
+    <nav id="navUnten" class="nav-unten"></nav>
+  </div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="src/models.js"></script>
+  <script src="src/api.js"></script>
+  <script src="src/store.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/views/fuss-zeichnung.js"></script>
+  <script src="src/views/start.js"></script>
+  <script src="src/views/personen.js"></script>
+  <script src="src/views/messen.js"></script>
+  <script src="src/views/garne.js"></script>
+  <script src="src/views/proben.js"></script>
+  <script src="src/views/rechner.js"></script>
+  <script src="src/views/einstellungen.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
