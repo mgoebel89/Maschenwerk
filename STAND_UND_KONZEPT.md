@@ -12,8 +12,28 @@ Runde abzuarbeiten. Hauptsächlich **Socken** (für verschiedene Personen in der
 
 ## Stand 2026-11-02
 - Konzept geschrieben und Funktionsumfang in drei Fragerunden abgestimmt.
-- **Noch nichts gebaut**, kein Repo, kein Container.
-- Nächster Schritt: Stufe A (Fundament) bauen.
+- **Stufe A gebaut**, lokales Git-Repo (Zweig `main`), Commit `c36d70b`. **Noch kein GitHub-Repo,
+  nichts auf dem Proxmox installiert.** Erwartete Repo-Adresse in den Skripten:
+  `https://github.com/mgoebel89/Maschenwerk.git` (muss öffentlich sein, sonst klappt der wget-Einzeiler nicht).
+- Lokal geprüft (Browser-Pane, `tests/dev_server.py`, Launch-Config `maschenwerk-dev` Port 8470):
+  Person anlegen → Messmaske (Schritte, Tippen auf Linie, Speichern beim sofortigen Verlassen,
+  Plausibilitätswarnung), Garn, Probe rund (40 M/13,3 cm, 60 Rd/14,3 cm → 30,1 M / 42 Rd),
+  Rechner (23 cm −10 % → 64 M, L16–R16 je Bett; 16 cm → 67 Rd = RC +134; 54→90 über 120 R),
+  Export/Import, Messblatt, Handy- und PC-Layout. Syntax von server.js/db.js per `new Function` im Browser.
+- **NICHT geprüft: das Node-Backend selbst und alle deploy-Skripte** (kein Node am PC, kein Container).
+  Shell-Skripte nur mit `bash -n`.
+
+## Stufe A – was drin ist
+- Backend `backend/server.js`: Payload-CRUD für personen/garne/proben/projekte/vorlagen, `/api/snapshot`,
+  `/api/export`, `/api/import` (ersetzt alles in einer Transaktion), `/api/system` + `/api/system/update/:art`.
+- Update auf Knopfdruck wie TrackingDRS: Anfrage-Datei in `/var/lib/maschenwerk/update/` →
+  `.path`-Unit → `maschenwerk-selbstupdate pruefen|ausfuehren` (root) → Ergebnis in `/var/lib/maschenwerk-update/`.
+  Vor dem Update `maschenwerk-backup`. Voller Git-Klon (nicht shallow), damit `rev-list --count` stimmt.
+- `deploy/hilfsskripte.sh` wird von Setup UND Update aufgerufen (Hilfsbefehle, Units, Cron).
+- Frontend: Hash-Router, jede Ansicht bekommt einen frischen Container (sonst stapeln sich Listener —
+  war der erste Fehler: „Weiter" sprang zwei Maße). Ansichten mit Eingabefeldern haben `live: false`.
+- Schätzung aus Schuhgröße: Fußlänge = Gr × 2/3 − 1,5; Umfang = Länge × 0,98 (≤ Gr 30) … 0,92 (≥ Gr 38);
+  Rist ×1,04, Ferse ×1,36, Knöchel ×0,95, Wade = Knöchel ×1,5. Plausibilität: Länge ±10 %, Umfänge ±20 %.
 
 ## Entscheidungen (2026-11-02)
 | Thema | Entscheidung |
