@@ -91,13 +91,17 @@ ok "Backend läuft."
 schritt='TLS-Zertifikat erzeugen'
 install -d -m 0700 /etc/ssl/maschenwerk
 if [[ ! -f /etc/ssl/maschenwerk/server.crt ]]; then
-  IPADDR=$(hostname -I | awk '{print $1}')
-  log "Erzeuge selbstsigniertes Zertifikat für ${CERT_HOST} / ${IPADDR}…"
+  # ALLE IPv4-Adressen ins Zertifikat: `hostname -I` liefert mehrere nicht in
+  # fester Reihenfolge, nur die erste zu nehmen traf beim ersten Lauf die falsche.
+  IPS=$(hostname -I | tr ' ' '\n' | grep -E '^[0-9]+(\.[0-9]+){3}$' || true)
+  SAN="DNS:${CERT_HOST},DNS:localhost,IP:127.0.0.1"
+  for ip in $IPS; do SAN="${SAN},IP:${ip}"; done
+  log "Erzeuge selbstsigniertes Zertifikat für ${CERT_HOST} / $(echo $IPS)…"
   openssl req -x509 -nodes -newkey rsa:2048 -days 3650 \
     -keyout /etc/ssl/maschenwerk/server.key \
     -out /etc/ssl/maschenwerk/server.crt \
     -subj "/CN=${CERT_HOST}" \
-    -addext "subjectAltName=DNS:${CERT_HOST},DNS:localhost,IP:${IPADDR},IP:127.0.0.1" >/dev/null 2>&1
+    -addext "subjectAltName=${SAN}" >/dev/null 2>&1
   chmod 0600 /etc/ssl/maschenwerk/server.key
 fi
 ok "Zertifikat vorhanden."
@@ -128,7 +132,7 @@ if ! nginx -t; then
   exit 1
 fi
 systemctl enable nginx >/dev/null 2>&1
-systemctl reload nginx || systemctl restart nginx
+systemctl reload-or-restart nginx
 ok "nginx konfiguriert."
 
 # ------------------------------------------- Hilfsskripte, Update, Cron ----
@@ -163,8 +167,9 @@ fi
 trap - ERR
 if [[ "$FEHLER" -ne 0 ]]; then err "Einrichtung unvollständig — siehe Meldungen oben."; exit 1; fi
 
-IPADDR=$(hostname -I | awk '{print $1}')
 if [[ "$HTTPS_PORT" == "443" ]]; then SUFFIX=""; else SUFFIX=":${HTTPS_PORT}"; fi
 echo
 ok "Einrichtung abgeschlossen."
-echo "   URL: https://${IPADDR}${SUFFIX}"
+for ip in $(hostname -I | tr ' ' '\n' | grep -E '^[0-9]+(\.[0-9]+){3}$'); do
+  echo "   URL: https://${ip}${SUFFIX}"
+done
