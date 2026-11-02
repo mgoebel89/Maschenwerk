@@ -14,7 +14,9 @@ Runde abzuarbeiten. Hauptsächlich **Socken** (für verschiedene Personen in der
 - Konzept geschrieben und Funktionsumfang in drei Fragerunden abgestimmt.
 - **Stufe A gebaut**, lokales Git-Repo (Zweig `main`), Commit `c36d70b`. Auf GitHub gepusht:
   `https://github.com/mgoebel89/Maschenwerk` (öffentlich, Installer per raw-URL abrufbar, geprüft).
-  **Noch nichts auf dem Proxmox 192.168.5.40 installiert.**
+  **Installiert als CT 119** (2026-11-02), alle Abnahmeprüfungen grün. Matthias hat die IP während der
+  Einrichtung auf **192.168.5.40** umgestellt → Zertifikat wurde noch auf die alte DHCP-Adresse
+  192.168.2.121 ausgestellt und muss neu erzeugt werden. Praxistest am Handy steht aus.
 - Lokal geprüft (Browser-Pane, `tests/dev_server.py`, Launch-Config `maschenwerk-dev` Port 8470):
   Person anlegen → Messmaske (Schritte, Tippen auf Linie, Speichern beim sofortigen Verlassen,
   Plausibilitätswarnung), Garn, Probe rund (40 M/13,3 cm, 60 Rd/14,3 cm → 30,1 M / 42 Rd),
