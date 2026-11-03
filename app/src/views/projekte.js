@@ -52,7 +52,7 @@
       ${t(116, 56, `Schaft ${w.schaftRunden} Rd`)}
       ${t(4, 150, `Ferse ${w.ferse.reihen} R`, true)}
       ${t(96, 154, `Fuß ${w.fussRunden} Rd`)}
-      ${t(196, 112, `Spitze ${w.spitze.reihen} R`, true)}
+      ${t(196, 112, `Spitze ${w.spitze.kurz || w.spitze.reihen + ' R'}`, true)}
       ${t(4, 12, `${w.maschen} M`)}
     </svg>`;
   }
@@ -123,7 +123,7 @@
         <tr><td>Schaft</td><td class="zahl">${w.schaftRunden} Runden · ${M.fmt(w.schaftCm)} cm</td></tr>
         <tr><td>Ferse</td><td class="zahl">${w.ferse.reihen} Reihen · ${w.jeBett} → ${w.ferse.rest} → ${w.jeBett}</td></tr>
         <tr><td>Fuß</td><td class="zahl">${w.fussRunden} Runden · ${M.fmt(w.fussCm)} cm</td></tr>
-        <tr><td>Spitze</td><td class="zahl">${w.spitze.reihen} Reihen</td></tr>
+        <tr><td>Spitze</td><td class="zahl">${w.spitze.art === 'band' ? `Bandspitze · ${w.spitze.runden} Runden · ${w.maschen} → ${w.spitze.restGesamt}` : `${w.spitze.reihen} Reihen · ${w.jeBett} → ${w.spitze.rest} → ${w.jeBett}`}</td></tr>
         <tr><td>Reihenzähler je Socke</td><td class="zahl"><b>RC ${S.rc(w.rcGesamt)}</b></td></tr>
         <tr><td>Garn je Paar (Schätzung)</td><td class="zahl">≈ ${M.fmt(w.garnM * 2, 0)} m${w.garnG ? ` · ${M.fmt(w.garnG * 2, 0)} g` : ''}${knaeuel ? ` · ${knaeuel} Knäuel` : ''}</td></tr>
       </table>
@@ -169,8 +169,8 @@
               ${feld({ name: 'weite', label: 'Weite', wert: f.weite, typ: 'zahl', einheit: '%' })}
               ${feld({ name: 'schaftHoeheCm', label: 'Schafthöhe', wert: f.schaftHoeheCm, typ: 'zahl', einheit: 'cm', hinweis: 'Boden bis Bündchenende' })}
               ${feld({ name: 'sockenLaengeCm', label: 'Sockenlänge', wert: f.sockenLaengeCm, typ: 'zahl', einheit: 'cm', hinweis: 'Fußlänge − 0,5 cm' })}
-              <label class="feld"><span class="feld-label">Ferse</span><select name="ferse">${opt(S.FORMEN, f.ferse)}</select></label>
-              <label class="feld"><span class="feld-label">Spitze</span><select name="spitze">${opt(S.FORMEN, f.spitze)}</select></label>
+              <label class="feld"><span class="feld-label">Ferse</span><select name="ferse">${opt(S.FERSEN, f.ferse)}</select></label>
+              <label class="feld"><span class="feld-label">Spitze</span><select name="spitze">${opt(S.SPITZEN, f.spitze)}</select></label>
             </div>
             <label class="check"><input type="checkbox" name="wadenabnahme"> Wadenabnahme (oben weiter, zum Knöchel hin abnehmen)</label>
             <label class="feld"><span class="feld-label">Anzahl</span>

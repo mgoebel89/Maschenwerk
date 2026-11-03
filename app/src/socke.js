@@ -26,11 +26,16 @@
   // Fersen- und Spitzenformen. `rest`: Anteil der Maschen, der in der Mitte
   // stehen bleibt; `zwischen`: gerade Reihen über die Restmaschen zwischen
   // Ab- und Aufbau (gibt eine etwas tiefere, rundere Ferse).
+  // Die Bandspitze (`art: 'band'`) gibt es nur für die Spitze: sie wird rund
+  // weitergestrickt und an den beiden Seitenkanten des Schlauchs abgenommen.
   const FORMEN = [
-    { wert: 'bumerang', label: 'Bumerang (verkürzte Reihen bis ⅓)', rest: 1 / 3, zwischen: 0 },
-    { wert: 'bumerang-tief', label: 'Bumerang tief (+ 2 Zwischenreihen)', rest: 1 / 3, zwischen: 2 },
-    { wert: 'bumerang-breit', label: 'Bumerang breit (bis ⅖, flacher)', rest: 0.4, zwischen: 0 },
+    { wert: 'bumerang', label: 'Bumerang (verkürzte Reihen bis ⅓)', art: 'verkuerzt', rest: 1 / 3, zwischen: 0 },
+    { wert: 'bumerang-tief', label: 'Bumerang tief (+ 2 Zwischenreihen)', art: 'verkuerzt', rest: 1 / 3, zwischen: 2 },
+    { wert: 'bumerang-breit', label: 'Bumerang breit (bis ⅖, flacher)', art: 'verkuerzt', rest: 0.4, zwischen: 0 },
+    { wert: 'band', label: 'Bandspitze (rund, an den Seiten abnehmen bis ¼)', art: 'band', rest: 1 / 4 },
   ];
+  const FERSEN = FORMEN.filter(x => x.art === 'verkuerzt');
+  const SPITZEN = FORMEN;
 
   // Einstellungs-Vorlagen (Ebene 3). Liegen in den Settings und sind dort
   // bearbeitbar — die Hebelnamen von KH-588/KR-586 stehen hier nur als
@@ -86,7 +91,7 @@
   // Verkürzte Reihen (Ferse oder Spitze) über die Maschen des Hauptbetts.
   // Liefert die Einzelreihen mit Nadelzustand für die Grafik.
   function verkuerzt({ F, form, labels, rcStart, seiteStart, mpc, rpc, methode, name }) {
-    const f = FORMEN.find(x => x.wert === form) || FORMEN[0];
+    const f = FERSEN.find(x => x.wert === form) || FERSEN[0];
     let rest = Math.round(F * f.rest);
     if ((F - rest) % 2) rest += 1;                 // beidseitig gleich viele halten
     rest = Math.max(2, Math.min(F - 2, rest));
@@ -125,6 +130,31 @@
     return { name, F, rest, ab, zw, tiefe, reihen, rcEnde: r, seiteEnde: seite, maschen, form: f };
   }
 
+  // Bandspitze rund auf dem Doppelbett. Eine Abnahme nimmt je Bett an beiden
+  // Rändern 1 Masche ab (4 Maschen): die beiden äußeren Maschen rücken mit dem
+  // Zweifach-Decker 1 Nadel nach innen, so bleibt an jeder Seitenkante ein
+  // Band aus je 1 Randmasche der beiden Betten stehen. Rhythmus wie von Hand:
+  // bis zur Hälfte der Maschen jede 2. Runde, danach jede Runde, bis etwa ¼
+  // übrig ist (mindestens 4 je Bett) — der Rest wird im Maschenstich geschlossen.
+  function band({ M0, rcStart, rpc }) {
+    const f = FORMEN.find(x => x.wert === 'band');
+    const k = Math.max(1, Math.min(Math.floor((M0 - 8) / 4), Math.round((M0 - M0 * f.rest) / 4)));
+    const restGesamt = M0 - 4 * k;
+    const schritte = [];
+    let maschen = M0, r = rcStart, runden = 0, gestrickt = 0;
+    for (let i = 0; i < k; i++) {
+      const alle = maschen > M0 / 2 ? 2 : 1;
+      maschen -= 4;
+      schritte.push({ typ: 'text', titel: `Abnahme ${i + 1} von ${k}`, abnahme: true,
+        text: `Je Bett links und rechts die 2 äußeren Maschen mit dem Zweifach-Decker 1 Nadel nach innen setzen, die frei gewordenen Randnadeln nach A. Danach ${maschen} Maschen, ${maschen / 2} je Bett: ${M.nadeln(maschen / 2).text}.` });
+      schritte.push({ typ: 'block', einheit: 'Runden', anzahl: alle, proImpuls: 1, rcVon: r, rcBis: r + alle * 2,
+        text: alle === 1 ? '1 Runde rund stricken.' : `${alle} Runden rund stricken.` });
+      r += alle * 2; runden += alle; gestrickt += maschen * alle;
+    }
+    return { name: 'Spitze', form: f, art: 'band', M0, restGesamt, rest: restGesamt / 2, abnahmen: k, runden,
+      tiefe: runden / rpc, schritte, rcEnde: r, maschen: gestrickt };
+  }
+
   // Hauptfunktion. `e` = { masse, weite, probe:{m10,r10,maschenweite}, form, garn, methode }
   function berechne(e) {
     const warnungen = [];
@@ -159,7 +189,11 @@
     if (bReihen % 2) bReihen++;
 
     const ferseProbe = verkuerzt({ F: jeBett, form: f.ferse, labels, rcStart: 0, seiteStart: 'rechts', mpc, rpc, methode, name: 'Ferse' });
-    const spitzeProbe = verkuerzt({ F: jeBett, form: f.spitze, labels, rcStart: 0, seiteStart: 'rechts', mpc, rpc, methode, name: 'Spitze' });
+    const istBand = (FORMEN.find(x => x.wert === f.spitze) || {}).art === 'band';
+    const spitzeRechnen = (rcStart) => istBand
+      ? band({ M0, rcStart, rpc })
+      : verkuerzt({ F: jeBett, form: f.spitze, labels, rcStart, seiteStart: 'rechts', mpc, rpc, methode, name: 'Spitze' });
+    const spitzeProbe = spitzeRechnen(0);
 
     const schaftHoehe = M.zahl(f.schaftHoeheCm) || 15;
     const schaftCm = schaftHoehe - buendchenCm - ferseProbe.tiefe;
@@ -237,20 +271,31 @@
       schritte: [{ typ: 'block', einheit: 'Runden', anzahl: fussRunden, proImpuls: 1, rcVon: r, rcBis: r + fussRunden * 2, text: `${fussRunden} Runden rund stricken.` }] });
     r += fussRunden * 2;
 
-    const spitze = verkuerzt({ F: jeBett, form: f.spitze, labels, rcStart: r, seiteStart: 'rechts', mpc, rpc, methode, name: 'Spitze' });
-    abschnitte.push({ id: 'spitze', titel: 'Spitze', vorlage: 'verkuerzt', mwHaupt: mw, mwRibber: '', nadeln: `Hauptbett ${labels[0]} – ${labels[labels.length - 1]}, Ribber ruht`,
-      rcVon: r, rcBis: spitze.rcEnde, umfang: `${spitze.reihen.length} R`, verkuerzt: { F: jeBett, rest: spitze.rest, ab: spitze.ab, zw: spitze.zw },
-      schritte: [
-        { typ: 'text', titel: 'Spitze vorbereiten', text: `Wie bei der Ferse: Ribber stillsetzen, Halte-Hebel auf H, verkürzte Reihen von ${jeBett} bis auf ${spitze.rest} Maschen und zurück.` },
-        ...spitze.reihen,
-      ] });
+    const spitze = spitzeRechnen(r);
+    if (istBand) {
+      abschnitte.push({ id: 'spitze', titel: 'Spitze', vorlage: 'rund', mwHaupt: mw, mwRibber: mw, nadeln: `${M0} → ${spitze.restGesamt} M`,
+        rcVon: r, rcBis: spitze.rcEnde, umfang: `${spitze.runden} Rd`, band: { von: M0, bis: spitze.restGesamt, abnahmen: spitze.abnahmen },
+        schritte: [
+          { typ: 'text', titel: 'Bandspitze', text: `Weiter rund stricken, Halte-Hebel bleibt auf N. Je Abnahme 4 Maschen weniger (je Bett an beiden Rändern 1), bis zur Hälfte jede 2. Runde, danach jede Runde: von ${M0} auf ${spitze.restGesamt} Maschen, ${spitze.abnahmen} Abnahmen. Gewichte mit nach innen nehmen.` },
+          ...spitze.schritte,
+        ] });
+    } else {
+      abschnitte.push({ id: 'spitze', titel: 'Spitze', vorlage: 'verkuerzt', mwHaupt: mw, mwRibber: '', nadeln: `Hauptbett ${labels[0]} – ${labels[labels.length - 1]}, Ribber ruht`,
+        rcVon: r, rcBis: spitze.rcEnde, umfang: `${spitze.reihen.length} R`, verkuerzt: { F: jeBett, rest: spitze.rest, ab: spitze.ab, zw: spitze.zw },
+        schritte: [
+          { typ: 'text', titel: 'Spitze vorbereiten', text: `Wie bei der Ferse: Ribber stillsetzen, Halte-Hebel auf H, verkürzte Reihen von ${jeBett} bis auf ${spitze.rest} Maschen und zurück.` },
+          ...spitze.reihen,
+        ] });
+    }
     r = spitze.rcEnde;
 
-    abschnitte.push({ id: 'schluss', titel: 'Abnehmen und Maschenstich', vorlage: 'rund', mwHaupt: mw, mwRibber: mw, nadeln: `${jeBett} je Bett`,
+    // Offene Maschen je Bett am Ende: bei der Bandspitze nur noch der Rest.
+    const schlussJeBett = istBand ? spitze.rest : jeBett;
+    abschnitte.push({ id: 'schluss', titel: 'Abnehmen und Maschenstich', vorlage: 'rund', mwHaupt: mw, mwRibber: mw, nadeln: `${schlussJeBett} je Bett`,
       rcVon: r, rcBis: r, umfang: '–',
       schritte: [
         { typ: 'text', titel: 'Hilfsgarn', text: 'Halte-Hebel auf N. 6–8 Runden mit Hilfsgarn rund stricken und die Socke von der Maschine nehmen.' },
-        { typ: 'text', titel: 'Maschenstich', text: `Die ${jeBett} offenen Maschen der Oberseite gegen die ${jeBett} der Sohle legen. Mit der Wollnadel: vorne wie zum Rechtsstricken einstechen und abgleiten lassen, die nächste vordere wie zum Linksstricken einstechen; hinten wie zum Linksstricken einstechen und abgleiten lassen, die nächste hintere wie zum Rechtsstricken einstechen. Hilfsgarn nach und nach ausziehen.` },
+        { typ: 'text', titel: 'Maschenstich', text: `Die ${schlussJeBett} offenen Maschen der Oberseite gegen die ${schlussJeBett} der Sohle legen. Mit der Wollnadel: vorne wie zum Rechtsstricken einstechen und abgleiten lassen, die nächste vordere wie zum Linksstricken einstechen; hinten wie zum Linksstricken einstechen und abgleiten lassen, die nächste hintere wie zum Rechtsstricken einstechen. Hilfsgarn nach und nach ausziehen.` },
       ] });
 
     // --- Garnbedarf (Schätzung) ------------------------------------------
@@ -271,7 +316,9 @@
         buendchen: b.wert, buendchenReihen: bReihen, buendchenCm,
         schaftRunden, schaftCm, fussRunden, fussCm, sockenLaengeCm: L,
         ferse: { rest: ferse.rest, ab: ferse.ab, zw: ferse.zw, tiefe: ferse.tiefe, reihen: ferse.reihen.length, form: f.ferse },
-        spitze: { rest: spitze.rest, ab: spitze.ab, zw: spitze.zw, tiefe: spitze.tiefe, reihen: spitze.reihen.length, form: f.spitze },
+        spitze: istBand
+          ? { art: 'band', rest: spitze.rest, restGesamt: spitze.restGesamt, abnahmen: spitze.abnahmen, runden: spitze.runden, tiefe: spitze.tiefe, form: f.spitze, kurz: `${spitze.runden} Rd` }
+          : { art: 'verkuerzt', rest: spitze.rest, ab: spitze.ab, zw: spitze.zw, tiefe: spitze.tiefe, reihen: spitze.reihen.length, form: f.spitze, kurz: `${spitze.reihen.length} R` },
         rcGesamt: r, garnM, garnG,
       },
       bett: { labels },
@@ -298,5 +345,5 @@
     return liste;
   }
 
-  MW.socke = { BUENDCHEN, FORMEN, VORLAGEN, VERKUERZT_STANDARD, bettLabels, mwVerschieben, vorschlag, berechne, karten, rc };
+  MW.socke = { BUENDCHEN, FORMEN, FERSEN, SPITZEN, VORLAGEN, VERKUERZT_STANDARD, bettLabels, mwVerschieben, vorschlag, berechne, karten, rc };
 })();

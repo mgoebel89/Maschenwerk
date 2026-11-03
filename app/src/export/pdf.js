@@ -120,7 +120,7 @@
     t(`Schaft ${w.schaftRunden} Rd`, 116, 56);
     t(`Ferse ${w.ferse.reihen} R`, 10, 158, true);
     t(`Fuß ${w.fussRunden} Rd`, 100, 158);
-    t(`Spitze ${w.spitze.reihen} R`, 196, 112, true);
+    t(`Spitze ${w.spitze.kurz || w.spitze.reihen + ' R'}`, 196, 112, true);
   }
 
   function reihenfolge(abschnitt) {
@@ -185,7 +185,9 @@
         ['Sockenlänge', `${M.fmt(w.sockenLaengeCm)} cm`],
         ['Schafthöhe', `${M.fmt(e.form.schaftHoeheCm)} cm`],
         ['Ferse', `${(S.FORMEN.find(f => f.wert === w.ferse.form) || {}).label}, ${w.jeBett} -> ${w.ferse.rest} -> ${w.jeBett} M`],
-        ['Spitze', `${(S.FORMEN.find(f => f.wert === w.spitze.form) || {}).label}, ${w.jeBett} -> ${w.spitze.rest} -> ${w.jeBett} M`],
+        ['Spitze', w.spitze.art === 'band'
+          ? `Bandspitze, ${w.maschen} -> ${w.spitze.restGesamt} M in ${w.spitze.runden} Runden (${w.spitze.abnahmen} Abnahmen)`
+          : `${(S.FORMEN.find(f => f.wert === w.spitze.form) || {}).label}, ${w.jeBett} -> ${w.spitze.rest} -> ${w.jeBett} M`],
         ['Reihenzähler', `RC ${S.rc(w.rcGesamt)} je Socke, ${socken} Socken`],
         ['Garn je Paar', `ca. ${M.fmt(w.garnM * 2, 0)} m${gew}`],
       ];
@@ -220,23 +222,29 @@
       // Verkürzte Reihen im Detail
       for (const id of ['ferse', 'spitze']) {
         const a = p.anleitung.abschnitte.find(x => x.id === id);
+        if (!a.verkuerzt) continue;
         ctx.ueberschrift(`${a.titel}: Nadelfolge der verkürzten Reihen`, 11);
         ctx.text(`Nur Hauptbett, Ribber ruht. Halte-Hebel auf H. Der Schlitten steht zu Beginn rechts.`, { size: 9, farbe: GRAU });
         for (const t of reihenfolge(a)) { ctx.text(t, { size: 9 }); ctx.y += 1; }
       }
 
-      // Wadenabnahme im Detail
-      const schaft = p.anleitung.abschnitte.find(x => x.id === 'schaft');
-      if (schaft.schritte.some(s => s.abnahme)) {
-        ctx.ueberschrift('Schaft mit Wadenabnahme', 11);
-        let rr = schaft.rcVon;
+      // Wadenabnahme und Bandspitze im Detail
+      const abnahmen = [
+        ['schaft', 'Schaft mit Wadenabnahme', 'Je Abnahme: je Bett an beiden Rändern 1 Masche auf die Nachbarnadel decken (4 Maschen weniger).'],
+        ['spitze', 'Bandspitze', 'Je Abnahme: je Bett links und rechts die 2 äußeren Maschen mit dem Zweifach-Decker 1 Nadel nach innen setzen, freie Randnadeln nach A (4 Maschen weniger). Am Ende die Restmaschen im Maschenstich schließen.'],
+      ];
+      for (const [id, titel, hinweis] of abnahmen) {
+        const a = p.anleitung.abschnitte.find(x => x.id === id);
+        if (!a || !a.schritte.some(s => s.abnahme)) continue;
+        ctx.ueberschrift(titel, 11);
+        let rr = a.rcVon;
         const folge = [];
-        for (const s of schaft.schritte) {
+        for (const s of a.schritte) {
           if (s.abnahme) folge.push(`RC ${S.rc(rr)}: abnehmen`);
-          else rr = s.rcBis;
+          else if (s.typ === 'block') rr = s.rcBis;
         }
         ctx.text(folge.join(' · '), { size: 9 });
-        ctx.text('Je Abnahme: je Bett an beiden Rändern 1 Masche auf die Nachbarnadel decken (4 Maschen weniger).', { size: 9, farbe: GRAU });
+        ctx.text(hinweis, { size: 9, farbe: GRAU });
       }
 
       // Änderungen beim Stricken

@@ -22,6 +22,15 @@ Runde abzuarbeiten. Hauptsächlich **Socken** (für verschiedene Personen in der
   Hebelnamen von KH-588/KR-586 stehen weiter als Platzhalter ⚑ in den Einstellungs-Vorlagen
   (Einstellungen → Vorlagen); Matthias kann sie dort selbst eintragen.
 
+## 0.2.1 (2026-11-03): Bandspitze
+Matthias vermisste beim ersten echten Projekt die **Bandspitze**. Sie ist jetzt die vierte Spitzenform (`art: 'band'`,
+nur für die Spitze; die Ferse bietet `FERSEN` = nur verkürzte Reihen). Die Bandspitze wird rund weitergestrickt. Bei jeder Abnahme
+setzt man je Bett links und rechts die 2 äußeren Maschen mit dem Zweifach-Decker 1 Nadel nach innen (4 Maschen weniger, an jeder
+Seitenkante bleibt ein Band aus 2 Randmaschen). Bis zur Hälfte der Maschen jede 2. Runde, danach jede Runde, bis etwa ¼ übrig ist
+(mindestens 4 je Bett). Danach Maschenstich über die Restmaschen. Beispiel Gr. 39: 64 → 16 Maschen in 20 Runden, ca. 4,8 cm tief.
+`werte.spitze.kurz` liefert den Kurztext für die Skizze. Alte Projekte ohne `art`/`kurz` funktionieren weiter. Lokal getestet
+(Assistent, Strickmodus, PDF), nicht an der Maschine.
+
 ## Stufe B – was drin ist
 - `app/src/socke.js`: Berechnung + Anleitung. RC: Rippe 1 Fahrt/Reihe, rund 2 Fahrten/Runde, verkürzt 1/Reihe.
   Maschen = rundeAuf(Umfang × (1+Weite) × M/cm, kgV(Rapport, 2)); Ferse/Spitze verkürzt bis Rest-Anteil
