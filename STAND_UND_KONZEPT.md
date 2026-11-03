@@ -100,6 +100,10 @@ nginx mit selbstsigniertem HTTPS (Wake Lock braucht secure context; auf Debian 1
 - **E** Muster-Assistent (8 Vorwahltasten + Handauswahl)
 
 ## Offen
+- **Matthias 2026-11-03: Die Schrittfolge und die Schlitteneinstellungen passen noch nicht.** Das betrifft die Reihenfolge
+  der Handgriffe, die nacheinander zu machen sind, und die Schlitteneinstellungen in den Vorlagen bzw. Checklisten.
+  Was genau falsch ist, hat er noch nicht gesagt. Vor dem nächsten Umbau fragen: welche Abschnitte, und wie es an der
+  KH-588/KR-586 tatsächlich geht. Ideal sind Anleitungsseiten oder seine eigene Reihenfolge. Nicht raten.
 - Belegung der 8 Vorwahltasten (Foto der Tasten oder der Anleitungsseite), spätestens zu Stufe E
 - Ribber ist **KR-586** (2026-11-02). Noch offen: Hebelbezeichnungen, Rundstrick-Einstellung,
   Versatz-Skala, Maschenweitenbereich des Ribberschlosses aus der Bedienungsanleitung übernehmen
