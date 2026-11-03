@@ -42,7 +42,7 @@ spitze=bandspitze|boomerangspitze). Die Regeln habe ich aus fünf Testfällen ab
   etwa die Hälfte der Abnahmen jede Runde. **Übernommen.** Die Tiefe schätzen wir mit 0,26 × Umfang; der Shop leitet sie
   anders ab, die Ergebnisse weichen um 1–2 Runden ab (bei 64 M genau gleich).
 - „Schaftlänge“ beim Shop = Strecke vom Anschlag bis zur Ferse (Länge × R/cm, Bündchen eingeschlossen). Bei uns ist es die Höhe
-  vom Boden bis zum Bündchenrand. **Nicht geändert**, Matthias wurde gefragt, welche Bedeutung er will.
+  vom Boden bis zum Bündchenrand. **Bleibt so** (Matthias, 2026-11-03: „Nein, so lassen“).
 - Der Shop setzt die Sockenlänge = Fußlänge, bei uns ist sie 0,5 cm kürzer (einstellbar). Seine Schätzung aus der Schuhgröße: FL ≈ 0,68 × Gr − 1,22.
 
 ## Stufe B – was drin ist
