@@ -32,7 +32,7 @@
     { wert: 'bumerang', label: 'Bumerang (verkürzte Reihen bis ⅓)', art: 'verkuerzt', rest: 1 / 3, zwischen: 0 },
     { wert: 'bumerang-tief', label: 'Bumerang tief (+ 2 Zwischenreihen)', art: 'verkuerzt', rest: 1 / 3, zwischen: 2 },
     { wert: 'bumerang-breit', label: 'Bumerang breit (bis ⅖, flacher)', art: 'verkuerzt', rest: 0.4, zwischen: 0 },
-    { wert: 'band', label: 'Bandspitze (rund, an den Seiten abnehmen bis ¼)', art: 'band', rest: 1 / 4 },
+    { wert: 'band', label: 'Bandspitze (rund, sanft abnehmen bis 8 Maschen)', art: 'band', tiefe: 0.26 },
   ];
   const FERSEN = FORMEN.filter(x => x.art === 'verkuerzt');
   const SPITZEN = FORMEN;
@@ -92,9 +92,11 @@
   // Liefert die Einzelreihen mit Nadelzustand für die Grafik.
   function verkuerzt({ F, form, labels, rcStart, seiteStart, mpc, rpc, methode, name }) {
     const f = FERSEN.find(x => x.wert === form) || FERSEN[0];
-    let rest = Math.round(F * f.rest);
-    if ((F - rest) % 2) rest += 1;                 // beidseitig gleich viele halten
-    rest = Math.max(2, Math.min(F - 2, rest));
+    // Außen je Seite aufgerundet stilllegen, der Rest bleibt in der Mitte —
+    // bei ⅓ ergibt 34 Maschen 12 | 10 | 12 (wie der Sockenrechner von
+    // strickmaschine-shop.de). 1e-9 fängt Rundungsfehler wie 11,000000000002 ab.
+    const seiteM = Math.min(Math.floor((F - 2) / 2), Math.max(1, Math.ceil(F * (1 - f.rest) / 2 - 1e-9)));
+    const rest = F - 2 * seiteM;
     const ab = F - rest;
     const zw = f.zwischen;
     const tiefe = (ab + zw / 2) / rpc;
@@ -133,25 +135,37 @@
   // Bandspitze rund auf dem Doppelbett. Eine Abnahme nimmt je Bett an beiden
   // Rändern 1 Masche ab (4 Maschen): die beiden äußeren Maschen rücken mit dem
   // Zweifach-Decker 1 Nadel nach innen, so bleibt an jeder Seitenkante ein
-  // Band aus je 1 Randmasche der beiden Betten stehen. Rhythmus wie von Hand:
-  // bis zur Hälfte der Maschen jede 2. Runde, danach jede Runde, bis etwa ¼
-  // übrig ist (mindestens 4 je Bett) — der Rest wird im Maschenstich geschlossen.
-  function band({ M0, rcStart, rpc }) {
+  // Band aus je 1 Randmasche der beiden Betten stehen.
+  // Rhythmus wie die klassische Bandspitze (und der Sockenrechner von
+  // strickmaschine-shop.de): bis auf 8 Maschen (10, wenn die Maschenzahl nicht
+  // durch 4 teilbar ist), erst jede 3., dann jede 2., zuletzt jede Runde. Etwa
+  // die Hälfte der Abnahmen kommt jede Runde; wie viele 3er- und 2er-Abstände es
+  // werden, richtet sich nach der Spitzentiefe ≈ 0,26 × Umfang (≈ halbe Breite).
+  function band({ M0, rcStart, rpc, mpc }) {
     const f = FORMEN.find(x => x.wert === 'band');
-    const k = Math.max(1, Math.min(Math.floor((M0 - 8) / 4), Math.round((M0 - M0 * f.rest) / 4)));
-    const restGesamt = M0 - 4 * k;
+    let restGesamt = M0 % 4 ? 10 : 8;
+    if (M0 - restGesamt < 4) restGesamt = M0 - 4;
+    const k = (M0 - restGesamt) / 4;
+    const ziel = Math.round(f.tiefe * M0 / mpc * rpc);      // Runden der Spitze
+    // Abstände nach der 1. Abnahme: je 1, 2 oder 3 Runden, absteigend.
+    const m = k - 1;
+    let eins = Math.ceil(m / 2), zwei = m - eins, drei = 0, summe = eins + 2 * zwei;
+    while (summe < ziel - 1 && zwei > 0) { zwei--; drei++; summe++; }
+    while (summe > ziel - 1 && zwei > 0) { zwei--; eins++; summe--; }
+    // Nach jeder Abnahme wird bis zur nächsten gestrickt, nach der letzten 1 Runde.
+    const abstaende = [...Array(drei).fill(3), ...Array(zwei).fill(2), ...Array(eins).fill(1), 1];
+    const rhythmus = [drei && `${drei}× jede 3. Runde`, zwei && `${zwei}× jede 2. Runde`, eins && `${eins}× jede Runde`].filter(Boolean).join(', ');
     const schritte = [];
     let maschen = M0, r = rcStart, runden = 0, gestrickt = 0;
-    for (let i = 0; i < k; i++) {
-      const alle = maschen > M0 / 2 ? 2 : 1;
+    abstaende.forEach((alle, i) => {
       maschen -= 4;
       schritte.push({ typ: 'text', titel: `Abnahme ${i + 1} von ${k}`, abnahme: true,
         text: `Je Bett links und rechts die 2 äußeren Maschen mit dem Zweifach-Decker 1 Nadel nach innen setzen, die frei gewordenen Randnadeln nach A. Danach ${maschen} Maschen, ${maschen / 2} je Bett: ${M.nadeln(maschen / 2).text}.` });
       schritte.push({ typ: 'block', einheit: 'Runden', anzahl: alle, proImpuls: 1, rcVon: r, rcBis: r + alle * 2,
         text: alle === 1 ? '1 Runde rund stricken.' : `${alle} Runden rund stricken.` });
       r += alle * 2; runden += alle; gestrickt += maschen * alle;
-    }
-    return { name: 'Spitze', form: f, art: 'band', M0, restGesamt, rest: restGesamt / 2, abnahmen: k, runden,
+    });
+    return { name: 'Spitze', form: f, art: 'band', M0, restGesamt, rest: restGesamt / 2, abnahmen: k, runden, rhythmus,
       tiefe: runden / rpc, schritte, rcEnde: r, maschen: gestrickt };
   }
 
@@ -191,7 +205,7 @@
     const ferseProbe = verkuerzt({ F: jeBett, form: f.ferse, labels, rcStart: 0, seiteStart: 'rechts', mpc, rpc, methode, name: 'Ferse' });
     const istBand = (FORMEN.find(x => x.wert === f.spitze) || {}).art === 'band';
     const spitzeRechnen = (rcStart) => istBand
-      ? band({ M0, rcStart, rpc })
+      ? band({ M0, rcStart, rpc, mpc })
       : verkuerzt({ F: jeBett, form: f.spitze, labels, rcStart, seiteStart: 'rechts', mpc, rpc, methode, name: 'Spitze' });
     const spitzeProbe = spitzeRechnen(0);
 
@@ -276,7 +290,7 @@
       abschnitte.push({ id: 'spitze', titel: 'Spitze', vorlage: 'rund', mwHaupt: mw, mwRibber: mw, nadeln: `${M0} → ${spitze.restGesamt} M`,
         rcVon: r, rcBis: spitze.rcEnde, umfang: `${spitze.runden} Rd`, band: { von: M0, bis: spitze.restGesamt, abnahmen: spitze.abnahmen },
         schritte: [
-          { typ: 'text', titel: 'Bandspitze', text: `Weiter rund stricken, Halte-Hebel bleibt auf N. Je Abnahme 4 Maschen weniger (je Bett an beiden Rändern 1), bis zur Hälfte jede 2. Runde, danach jede Runde: von ${M0} auf ${spitze.restGesamt} Maschen, ${spitze.abnahmen} Abnahmen. Gewichte mit nach innen nehmen.` },
+          { typ: 'text', titel: 'Bandspitze', text: `Weiter rund stricken, Halte-Hebel bleibt auf N. Je Abnahme 4 Maschen weniger (je Bett an beiden Rändern 1): von ${M0} auf ${spitze.restGesamt} Maschen in ${spitze.runden} Runden, ${spitze.abnahmen} Abnahmen. Nach der 1. Abnahme: ${spitze.rhythmus}. Gewichte mit nach innen nehmen.` },
           ...spitze.schritte,
         ] });
     } else {
@@ -317,7 +331,7 @@
         schaftRunden, schaftCm, fussRunden, fussCm, sockenLaengeCm: L,
         ferse: { rest: ferse.rest, ab: ferse.ab, zw: ferse.zw, tiefe: ferse.tiefe, reihen: ferse.reihen.length, form: f.ferse },
         spitze: istBand
-          ? { art: 'band', rest: spitze.rest, restGesamt: spitze.restGesamt, abnahmen: spitze.abnahmen, runden: spitze.runden, tiefe: spitze.tiefe, form: f.spitze, kurz: `${spitze.runden} Rd` }
+          ? { art: 'band', rest: spitze.rest, restGesamt: spitze.restGesamt, abnahmen: spitze.abnahmen, runden: spitze.runden, rhythmus: spitze.rhythmus, tiefe: spitze.tiefe, form: f.spitze, kurz: `${spitze.runden} Rd` }
           : { art: 'verkuerzt', rest: spitze.rest, ab: spitze.ab, zw: spitze.zw, tiefe: spitze.tiefe, reihen: spitze.reihen.length, form: f.spitze, kurz: `${spitze.reihen.length} R` },
         rcGesamt: r, garnM, garnG,
       },

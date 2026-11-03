@@ -31,6 +31,20 @@ Seitenkante bleibt ein Band aus 2 Randmaschen). Bis zur Hälfte der Maschen jede
 `werte.spitze.kurz` liefert den Kurztext für die Skizze. Alte Projekte ohne `art`/`kurz` funktionieren weiter. Lokal getestet
 (Assistent, Strickmodus, PDF), nicht an der Maschine.
 
+## 0.2.2 (2026-11-03): Abgleich mit dem Sockenrechner von strickmaschine-shop.de
+Matthias wollte die Rechnung mit https://strickmaschine-shop.de/Sockenrechner vergleichen. Der Rechner rechnet auf dem
+Server (POST-Formular: maschen, reihen, fussgr=fusslaenge|schuhgr, eingabe_fl, ballen, eingabe_schuhgr, bund,
+spitze=bandspitze|boomerangspitze). Die Regeln habe ich aus fünf Testfällen abgeleitet:
+- Anschlag = Ballen × 0,9 × M/cm, auf eine gerade Zahl aufgerundet. Das ist gleich wie bei uns, nur runden wir auf den Rapport (78 geht bei 2:2 nicht).
+- Ferse: außen je ⌈F/3⌉ stilllegen, der Rest bleibt in der Mitte (34 → 12|10|12). Die Tiefe sind die Abbaureihen geteilt durch Reihen pro cm.
+  **Übernommen** (vorher rundete die Mitte nach oben: 11|12|11).
+- Bandspitze bis 8 Maschen (10, wenn die Maschenzahl nicht durch 4 teilbar ist), Rhythmus jede 3. → 2. → jede Runde,
+  etwa die Hälfte der Abnahmen jede Runde. **Übernommen.** Die Tiefe schätzen wir mit 0,26 × Umfang; der Shop leitet sie
+  anders ab, die Ergebnisse weichen um 1–2 Runden ab (bei 64 M genau gleich).
+- „Schaftlänge“ beim Shop = Strecke vom Anschlag bis zur Ferse (Länge × R/cm, Bündchen eingeschlossen). Bei uns ist es die Höhe
+  vom Boden bis zum Bündchenrand. **Nicht geändert**, Matthias wurde gefragt, welche Bedeutung er will.
+- Der Shop setzt die Sockenlänge = Fußlänge, bei uns ist sie 0,5 cm kürzer (einstellbar). Seine Schätzung aus der Schuhgröße: FL ≈ 0,68 × Gr − 1,22.
+
 ## Stufe B – was drin ist
 - `app/src/socke.js`: Berechnung + Anleitung. RC: Rippe 1 Fahrt/Reihe, rund 2 Fahrten/Runde, verkürzt 1/Reihe.
   Maschen = rundeAuf(Umfang × (1+Weite) × M/cm, kgV(Rapport, 2)); Ferse/Spitze verkürzt bis Rest-Anteil

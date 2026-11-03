@@ -1,6 +1,6 @@
 {
   "name": "maschenwerk-backend",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "description": "Backend von Maschenwerk (Node + SQLite): Strickanleitungen für die Brother KH-588",
   "main": "server.js",
